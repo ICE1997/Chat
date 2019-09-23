@@ -30,10 +30,10 @@ import io.objectbox.Box;
 public class MQTTModel implements IMQTTModel {
     private final String TAG = MQTTModel.class.getSimpleName();
     private final String broker = "ws://47.106.132.194:8083";
-    private final String clientId = "device1";
+    private final String clientId = "device2";
     private MqttAsyncClient mClient;
     private MqttConnectOptions opt;
-    private String topic = "test1";
+    private String topic = "test2";
     private int qos = 2;
     private IMQTTPresenter imqttPresenter;
     private MqttCallback callback;

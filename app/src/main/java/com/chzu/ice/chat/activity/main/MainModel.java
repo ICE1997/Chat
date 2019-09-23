@@ -14,10 +14,10 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 public class MainModel implements IMainModel {
     private static final String TAG = MainModel.class.getSimpleName();
     private static final String broker = "ws://47.106.132.194:8083";
-    private static final String clientId = "device1";
+    private static final String clientId = "device2";
     private IMainPresenter mainPresenter;
     private MqttAsyncClient mClient;
-    private String topic = "test2";
+    private String topic = "test1";
     private MqttConnectOptions opts;
 
     public MainModel(IMainPresenter mainPresenter) throws MqttException {

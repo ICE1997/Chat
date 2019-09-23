@@ -1,6 +1,5 @@
 package com.chzu.ice.chat.adapter;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +26,7 @@ public class ChatViewAdapter extends RecyclerView.Adapter<ChatViewAdapter.ChatVi
     @NonNull
     @Override
     public ChatViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.chat_frame, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.chat_surface, parent, false);
         return new ChatViewHolder(view);
     }
 

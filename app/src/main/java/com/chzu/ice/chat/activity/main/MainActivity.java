@@ -16,6 +16,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.chzu.ice.chat.R;
+import com.chzu.ice.chat.activity.friends.FriendsActivity;
+import com.chzu.ice.chat.activity.login.LoginActivity;
 import com.chzu.ice.chat.adapter.ChatViewAdapter;
 import com.chzu.ice.chat.db.Message;
 import com.chzu.ice.chat.utils.ObjectBoxHelper;
@@ -45,6 +47,9 @@ public class MainActivity extends AppCompatActivity implements IMainView {
         }
         registerComponents();
         initData();
+
+        Intent intent = new Intent(this, FriendsActivity.class);
+        startActivity(intent);
 
         chatView.smoothScrollToPosition((int) messageBox.count());
 
