@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.chzu.ice.chat.R;
 
-public class FriendsListAdpter extends RecyclerView.Adapter<FriendsListAdpter.FriendsListHolder> {
+public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListAdapter.FriendsListHolder> {
     private String[] names = {"张三","李四","王五","你猜","张三","李四","王五","你猜","张三","李四","王五","你猜","张三","李四","王五","你猜"};
     @NonNull
     @Override

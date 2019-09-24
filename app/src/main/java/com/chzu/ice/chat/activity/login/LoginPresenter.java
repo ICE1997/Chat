@@ -4,28 +4,24 @@ public class LoginPresenter implements ILoginPresenter {
     private ILoginView loginView;
     private ILoginModel loginModel;
 
-    public LoginPresenter(ILoginView loginView) {
+    LoginPresenter(ILoginView loginView) {
         this.loginView = loginView;
         this.loginModel = new LoginModel(this);
     }
 
     @Override
     public void login(String usr, String pwd) {
-
+        loginModel.login(usr,pwd);
     }
 
     @Override
-    public void registerComponents() {
-        this.loginView.registerComponents();
+    public void loginSucceed() {
+        loginView.showLoginSucceed();
     }
 
-    @Override
-    public void wrongPasswordOrNoUser() {
-
-    }
 
     @Override
-    public void showWrongPasswordOrNoUser() {
-
+    public void isWrongPasswordOrNoUser() {
+        loginView.showWrongPasswordOrNoUser();
     }
 }

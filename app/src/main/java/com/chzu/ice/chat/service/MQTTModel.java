@@ -43,18 +43,15 @@ public class MQTTModel implements IMQTTModel {
 
     MQTTModel(IMQTTPresenter imqttPresenter) throws MqttException {
         this.imqttPresenter = imqttPresenter;
-
         messageBox = ObjectBoxHelper.get().boxFor(Message.class);
-
         mClient = new MqttAsyncClient(broker, clientId, new MemoryPersistence());
         opt = new MqttConnectOptions();
         opt.setCleanSession(false);
         opt.setAutomaticReconnect(true);
-        callback = new MMqttCallback();
+        callback = new MMQTTCallback();
         connectListener = new ConnectListener();
         subscribeListener = new SubscribeListener();
-
-        registerBroadcastReceiver();
+        registerSendMSGBroadcastReceiver();
     }
 
     @Override
@@ -95,7 +92,7 @@ public class MQTTModel implements IMQTTModel {
     public void publish(final String topic, String msg) {
         if (mClient.isConnected()) {
             try {
-                mClient.publish(topic, msg.getBytes(), 2, false, this, new IMqttActionListener() {
+                mClient.publish(topic, msg.getBytes(), qos, false, this, new IMqttActionListener() {
                     @Override
                     public void onSuccess(IMqttToken asyncActionToken) {
                         Log.d(TAG, "onSuccess: 发布成功 -> " + topic);
@@ -120,11 +117,10 @@ public class MQTTModel implements IMQTTModel {
         intent.putExtra("topic", topic);
         intent.putExtra("msg", msg);
         LocalBroadcastManager.getInstance(App.getApplication()).sendBroadcast(intent);
-        Log.d(TAG, "broadcastMessage: 已发送广播");
     }
 
     //发送信息
-    private void registerBroadcastReceiver() {
+    private void registerSendMSGBroadcastReceiver() {
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(App.getApplication());
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("sendMessage");
@@ -170,6 +166,7 @@ public class MQTTModel implements IMQTTModel {
         }
     }
 
+    //订阅主题
     private class SubscribeListener implements IMqttActionListener {
         @Override
         public void onSuccess(IMqttToken asyncActionToken) {
@@ -185,7 +182,8 @@ public class MQTTModel implements IMQTTModel {
         }
     }
 
-    private class MMqttCallback implements MqttCallback {
+    //MQTT回调
+    private class MMQTTCallback implements MqttCallback {
         Timer timer = new Timer();
         TimerTask task = new TimerTask() {
             @Override
@@ -212,8 +210,8 @@ public class MQTTModel implements IMQTTModel {
 
         @Override
         public void messageArrived(String topic, MqttMessage message) throws Exception {
-            Log.d(TAG, "messageArrived: topic: from " + topic);
-            Log.d(TAG, "messageArrived: msg;" + message.toString());
+//            Log.d(TAG, "messageArrived: topic: from " + topic);
+//            Log.d(TAG, "messageArrived: msg;" + message.toString());
             broadcastMessage(topic, message.toString());
         }
 
@@ -222,5 +220,4 @@ public class MQTTModel implements IMQTTModel {
 
         }
     }
-
 }

@@ -1,4 +1,4 @@
-package com.chzu.ice.chat.activity.main;
+package com.chzu.ice.chat.activity.chat;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
 
@@ -16,12 +16,7 @@ public class ChatPresenter implements IChatPresenter {
     public void publish(String s) throws MqttException {
         mainModel.publish(s);
     }
-
-    @Override
-    public void connect() throws MqttException {
-        mainModel.connect();
-    }
-
+    
     @Override
     public void publishSucceed() {
         mainView.showPublishSucceed();
@@ -32,13 +27,4 @@ public class ChatPresenter implements IChatPresenter {
         mainView.showPublishFailed();
     }
 
-    @Override
-    public void connectSucceed() {
-        mainView.showConnectSucceed();
-    }
-
-    @Override
-    public void connectFailed() {
-        mainView.showPublishFailed();
-    }
 }

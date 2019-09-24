@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.Bundle;
 
 import com.chzu.ice.chat.R;
-import com.chzu.ice.chat.adapter.FriendsListAdpter;
+import com.chzu.ice.chat.adapter.FriendsListAdapter;
 
 public class FriendsActivity extends AppCompatActivity implements IFriendsView {
     private RecyclerView friendsList;
@@ -20,9 +20,9 @@ public class FriendsActivity extends AppCompatActivity implements IFriendsView {
 
     private void registerComponents() {
         friendsList = findViewById(R.id.friendsList);
-        FriendsListAdpter friendsListAdpter = new FriendsListAdpter();
+        FriendsListAdapter friendsListAdapter = new FriendsListAdapter();
         LinearLayoutManager llm = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
         friendsList.setLayoutManager(llm);
-        friendsList.setAdapter(friendsListAdpter);
+        friendsList.setAdapter(friendsListAdapter);
     }
 }

@@ -1,4 +1,4 @@
-package com.chzu.ice.chat.activity.main;
+package com.chzu.ice.chat.activity.chat;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -45,13 +45,37 @@ public class ChatActivity extends AppCompatActivity implements IChatView {
             e.printStackTrace();
         }
         registerComponents();
+        registerInputListener();
+        registerBroadcastReceiver();
         initData();
+        chatView.scrollToPosition((int) messageBox.count());
+    }
 
-        Intent intent = new Intent(this, FriendsActivity.class);
-        startActivity(intent);
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
 
-        chatView.smoothScrollToPosition((int) messageBox.count());
+    private void initData() {
+        this.messageBox = ObjectBoxHelper.get().boxFor(Message.class);
+        List<Message> msgs = messageBox.getAll();
+        chatViewAdapter = new ChatViewAdapter(msgs);
+        LinearLayoutManager llm = new LinearLayoutManager(this);
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        chatView.setLayoutManager(llm);
+        chatView.setAdapter(chatViewAdapter);
+    }
 
+    private void registerInputListener() {
+        input.setOnKeyListener(new InputMSGListener());
+    }
+
+    private void registerComponents() {
+        this.chatView = findViewById(R.id.chatView);
+        this.input = findViewById(R.id.input);
+    }
+
+    private void registerBroadcastReceiver() {
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(getApplicationContext());
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("newMessage");
@@ -68,43 +92,6 @@ public class ChatActivity extends AppCompatActivity implements IChatView {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    private void initData() {
-        this.messageBox = ObjectBoxHelper.get().boxFor(Message.class);
-        List<Message> msgs = messageBox.getAll();
-        chatViewAdapter = new ChatViewAdapter(msgs);
-        LinearLayoutManager llm = new LinearLayoutManager(this);
-        llm.setOrientation(LinearLayoutManager.VERTICAL);
-        chatView.setLayoutManager(llm);
-        chatView.setAdapter(chatViewAdapter);
-
-        input.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View view, int i, KeyEvent keyEvent) {
-                if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER && keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
-                    Log.d(TAG, "onKey: " + input.getText());
-                    try {
-                        mainPresenter.connect();
-                        mainPresenter.publish(input.getText().toString());
-                    } catch (MqttException e) {
-                        e.printStackTrace();
-                    }
-                    return true;
-                }
-                return false;
-            }
-        });
-    }
-
-    private void registerComponents() {
-        this.chatView = findViewById(R.id.chatView);
-        this.input = findViewById(R.id.input);
-    }
-
-    @Override
     public void showPublishSucceed() {
 
     }
@@ -114,13 +101,19 @@ public class ChatActivity extends AppCompatActivity implements IChatView {
 
     }
 
-    @Override
-    public void showConnectSucceed() {
-
-    }
-
-    @Override
-    public void showConncectFailed() {
-
+    private class InputMSGListener implements View.OnKeyListener {
+        @Override
+        public boolean onKey(View view, int i, KeyEvent keyEvent) {
+            if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER && keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
+                Log.d(TAG, "onKey: " + input.getText());
+                try {
+                    mainPresenter.publish(input.getText().toString());
+                } catch (MqttException e) {
+                    e.printStackTrace();
+                }
+                return true;
+            }
+            return false;
+        }
     }
 }

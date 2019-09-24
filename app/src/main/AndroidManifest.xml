@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.friends.FriendsActivity" />
-        <activity android:name=".activity.main.ChatActivity">
+        <activity android:name=".activity.chat.ChatActivity">
         </activity>
 
         <service
