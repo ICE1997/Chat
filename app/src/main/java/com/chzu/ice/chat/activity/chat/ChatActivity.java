@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.chzu.ice.chat.R;
-import com.chzu.ice.chat.activity.friends.FriendsActivity;
 import com.chzu.ice.chat.adapter.ChatViewAdapter;
 import com.chzu.ice.chat.db.Message;
 import com.chzu.ice.chat.utils.ObjectBoxHelper;
@@ -27,11 +26,11 @@ import java.util.List;
 
 import io.objectbox.Box;
 
-public class ChatActivity extends AppCompatActivity implements IChatView {
+public class ChatActivity extends AppCompatActivity implements IChatContract.View {
     private final String TAG = ChatActivity.class.getSimpleName();
     private RecyclerView chatView;
     private EditText input;
-    private IChatPresenter mainPresenter;
+    private IChatContract.Presenter chatPresenter;
     private Box<Message> messageBox;
     private ChatViewAdapter chatViewAdapter;
 
@@ -39,14 +38,10 @@ public class ChatActivity extends AppCompatActivity implements IChatView {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        try {
-            this.mainPresenter = new ChatPresenter(this);
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
         registerComponents();
         registerInputListener();
         registerBroadcastReceiver();
+        new ChatPresenter(this,new ChatModel());
         initData();
         chatView.scrollToPosition((int) messageBox.count());
     }
@@ -101,13 +96,18 @@ public class ChatActivity extends AppCompatActivity implements IChatView {
 
     }
 
+    @Override
+    public void setPresenter(IChatContract.Presenter friendsPresenter) {
+        this.chatPresenter = friendsPresenter;
+    }
+
     private class InputMSGListener implements View.OnKeyListener {
         @Override
         public boolean onKey(View view, int i, KeyEvent keyEvent) {
             if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER && keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
                 Log.d(TAG, "onKey: " + input.getText());
                 try {
-                    mainPresenter.publish(input.getText().toString());
+                    chatPresenter.publish(input.getText().toString());
                 } catch (MqttException e) {
                     e.printStackTrace();
                 }

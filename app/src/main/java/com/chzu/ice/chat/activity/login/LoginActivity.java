@@ -13,8 +13,8 @@ import com.chzu.ice.chat.R;
 import com.chzu.ice.chat.activity.friends.FriendsActivity;
 import com.chzu.ice.chat.utils.ToastHelper;
 
-public class LoginActivity extends AppCompatActivity implements ILoginView {
-    private ILoginPresenter loginPresenter;
+public class LoginActivity extends AppCompatActivity implements ILoginContract.View {
+    private ILoginContract.Presenter loginPresenter;
     private Button loginBtn;
     private EditText usrEdt;
     private EditText pwdEdt;
@@ -25,7 +25,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginView {
         setContentView(R.layout.activity_login);
         registerComponents();
         registerListener();
-        this.loginPresenter = new LoginPresenter(this);
+        new LoginPresenter(this,new LoginModel());
     }
 
     @Override
@@ -48,6 +48,11 @@ public class LoginActivity extends AppCompatActivity implements ILoginView {
 
     public void registerListener() {
         this.loginBtn.setOnClickListener(new loginOnClickListener());
+    }
+
+    @Override
+    public void setPresenter(ILoginContract.Presenter loginPresenter) {
+        this.loginPresenter = loginPresenter;
     }
 
     private class loginOnClickListener implements View.OnClickListener{

@@ -1,30 +1,27 @@
 package com.chzu.ice.chat.activity.chat;
 
-import org.eclipse.paho.client.mqttv3.MqttException;
+public class ChatPresenter implements IChatContract.Presenter {
+    private ChatModel chatModel;
+    private IChatContract.View chatView;
 
-public class ChatPresenter implements IChatPresenter {
-    private IChatModel mainModel;
-    private IChatView mainView;
-
-    public ChatPresenter(IChatView mainView) throws MqttException {
-        this.mainView = mainView;
-        this.mainModel = new ChatModel(this);
-
+    ChatPresenter(IChatContract.View chatView, ChatModel chatModel) {
+        this.chatView = chatView;
+        this.chatModel = chatModel;
+        this.chatView.setPresenter(this);
     }
 
     @Override
-    public void publish(String s) throws MqttException {
-        mainModel.publish(s);
-    }
-    
-    @Override
-    public void publishSucceed() {
-        mainView.showPublishSucceed();
-    }
+    public void publish(String s) {
+        chatModel.publish(s, new ChatModel.PublishCallback() {
+            @Override
+            public void publishSucceed() {
+                chatView.showPublishSucceed();
+            }
 
-    @Override
-    public void publishFailed() {
-        mainView.showPublishFailed();
+            @Override
+            public void publishFailed() {
+                chatView.showPublishFailed();
+            }
+        });
     }
-
 }

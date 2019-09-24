@@ -1,11 +1,12 @@
 package com.chzu.ice.chat.activity.friends;
 
-public class FriendsPresenter implements IFriendsPresenter {
-    private IFriendsView iFriendsView;
-    private IFriendsModel iFriendsModel;
+class FriendsPresenter implements IFriendsContract.Presenter {
+    private IFriendsContract.View view;
+    private FriendsModel friendsModel;
 
-    public FriendsPresenter(IFriendsView iFriendsView) {
-        this.iFriendsView = iFriendsView;
-        this.iFriendsModel = new FriendsModel(this);
+    FriendsPresenter(IFriendsContract.View view, FriendsModel friendsModel) {
+        this.view = view;
+        this.friendsModel = friendsModel;
+        view.setPresenter(this);
     }
 }

@@ -1,20 +1,20 @@
 package com.chzu.ice.chat.activity.login;
 
-public class LoginModel implements ILoginModel {
-    private ILoginPresenter loginPresenter;
-    private  final String usr="123";
+class LoginModel {
+    private final String usr = "123";
     private final String pwd = "123";
 
-    LoginModel(ILoginPresenter presenter) {
-        this.loginPresenter = presenter;
+    void login(String usr, String pwd, LoginCallback callback) {
+        if (!this.usr.equals(usr) && !this.pwd.equals(pwd)) {
+            callback.isWrongPasswordOrNoUser();
+        } else {
+            callback.loginSucceed();
+        }
     }
 
-    @Override
-    public void login(String usr, String pwd) {
-        if(!this.usr.equals(usr)&&!this.pwd.equals(pwd)) {
-            loginPresenter.isWrongPasswordOrNoUser();
-        }else {
-            loginPresenter.loginSucceed();
-        }
+    interface LoginCallback {
+        void isWrongPasswordOrNoUser();
+
+        void loginSucceed();
     }
 }

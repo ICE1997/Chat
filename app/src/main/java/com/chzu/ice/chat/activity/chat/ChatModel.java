@@ -9,23 +9,23 @@ import com.chzu.ice.chat.App;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 
-public class ChatModel implements IChatModel {
+class ChatModel {
     private static final String TAG = ChatModel.class.getSimpleName();
-    private IChatPresenter mainPresenter;
     private MqttAsyncClient mClient;
     private String topic = "test1";
     private MqttConnectOptions opts;
 
-    ChatModel(IChatPresenter mainPresenter) {
-        this.mainPresenter = mainPresenter;
-    }
-
-    @Override
-    public void publish(final String s) {
+    void publish(final String s,PublishCallback callback) {
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(App.getApplication());
         Intent intent = new Intent("sendMessage");
         intent.putExtra("msg", s);
         intent.putExtra("topic", this.topic);
         localBroadcastManager.sendBroadcast(intent);
+        callback.publishSucceed();
+    }
+
+    interface PublishCallback {
+        void publishSucceed();
+        void publishFailed();
     }
 }
