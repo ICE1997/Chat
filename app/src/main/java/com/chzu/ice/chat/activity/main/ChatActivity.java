@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.chzu.ice.chat.R;
 import com.chzu.ice.chat.activity.friends.FriendsActivity;
-import com.chzu.ice.chat.activity.login.LoginActivity;
 import com.chzu.ice.chat.adapter.ChatViewAdapter;
 import com.chzu.ice.chat.db.Message;
 import com.chzu.ice.chat.utils.ObjectBoxHelper;
@@ -28,11 +27,11 @@ import java.util.List;
 
 import io.objectbox.Box;
 
-public class MainActivity extends AppCompatActivity implements IMainView {
-    private final String TAG = MainActivity.class.getSimpleName();
+public class ChatActivity extends AppCompatActivity implements IChatView {
+    private final String TAG = ChatActivity.class.getSimpleName();
     private RecyclerView chatView;
     private EditText input;
-    private IMainPresenter mainPresenter;
+    private IChatPresenter mainPresenter;
     private Box<Message> messageBox;
     private ChatViewAdapter chatViewAdapter;
 
@@ -41,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements IMainView {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         try {
-            this.mainPresenter = new MainPresenter(this);
+            this.mainPresenter = new ChatPresenter(this);
         } catch (MqttException e) {
             e.printStackTrace();
         }
@@ -65,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements IMainView {
                 chatViewAdapter.add(message);
                 chatView.smoothScrollToPosition((int) messageBox.count());
             }
-        },intentFilter);
+        }, intentFilter);
     }
 
     @Override

@@ -55,7 +55,6 @@ public class MQTTModel implements IMQTTModel {
         subscribeListener = new SubscribeListener();
 
         registerBroadcastReceiver();
-//        opt.setKeepAliveInterval(20);
     }
 
     @Override
@@ -92,20 +91,21 @@ public class MQTTModel implements IMQTTModel {
         mClient.unsubscribe(topic);
     }
 
-    private void publish(final String topic, String msg) {
+    @Override
+    public void publish(final String topic, String msg) {
         if (mClient.isConnected()) {
             try {
                 mClient.publish(topic, msg.getBytes(), 2, false, this, new IMqttActionListener() {
                     @Override
                     public void onSuccess(IMqttToken asyncActionToken) {
                         Log.d(TAG, "onSuccess: 发布成功 -> " + topic);
-//                                    mainPresenter.publishSucceed();
+                        imqttPresenter.publishSucceed();
                     }
 
                     @Override
                     public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
                         Log.d(TAG, "onFailure: 发布失败");
-//                                    mainPresenter.publishFailed();
+                        imqttPresenter.publishFailed();
                     }
                 });
             } catch (MqttException e) {
@@ -114,6 +114,7 @@ public class MQTTModel implements IMQTTModel {
         }
     }
 
+    //接收信息
     private void broadcastMessage(String topic, String msg) {
         Intent intent = new Intent("newMessage");
         intent.putExtra("topic", topic);
@@ -122,6 +123,7 @@ public class MQTTModel implements IMQTTModel {
         Log.d(TAG, "broadcastMessage: 已发送广播");
     }
 
+    //发送信息
     private void registerBroadcastReceiver() {
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(App.getApplication());
         IntentFilter intentFilter = new IntentFilter();
@@ -131,7 +133,7 @@ public class MQTTModel implements IMQTTModel {
             public void onReceive(Context context, Intent intent) {
                 String t = intent.getStringExtra("topic");
                 String m = intent.getStringExtra("msg");
-                publish(t, m);
+                MQTTModel.this.publish(t, m);
             }
         }, intentFilter);
     }

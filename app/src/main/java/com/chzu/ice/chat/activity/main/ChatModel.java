@@ -8,38 +8,31 @@ import com.chzu.ice.chat.App;
 
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
-public class MainModel implements IMainModel {
-    private static final String TAG = MainModel.class.getSimpleName();
+public class ChatModel implements IChatModel {
+    private static final String TAG = ChatModel.class.getSimpleName();
     private static final String broker = "ws://47.106.132.194:8083";
     private static final String clientId = "device2";
-    private IMainPresenter mainPresenter;
+    private IChatPresenter mainPresenter;
     private MqttAsyncClient mClient;
     private String topic = "test1";
     private MqttConnectOptions opts;
 
-    public MainModel(IMainPresenter mainPresenter) throws MqttException {
+    ChatModel(IChatPresenter mainPresenter) {
         this.mainPresenter = mainPresenter;
-        mClient = new MqttAsyncClient(broker, clientId, new MemoryPersistence());
-        opts = new MqttConnectOptions();
-        opts.setCleanSession(false);
-        opts.setAutomaticReconnect(true);
     }
 
     @Override
-    public void connect() throws MqttException {
+    public void connect() {
 
     }
 
     @Override
-    public void publish(final String s) throws MqttException {
+    public void publish(final String s) {
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(App.getApplication());
         Intent intent = new Intent("sendMessage");
         intent.putExtra("msg", s);
         intent.putExtra("topic", this.topic);
         localBroadcastManager.sendBroadcast(intent);
-
     }
 }

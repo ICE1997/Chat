@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.chzu.ice.chat.R;
 
 public class FriendsListAdpter extends RecyclerView.Adapter<FriendsListAdpter.FriendsListHolder> {
-    String[] names = {"张三","李四","王五","你猜"};
+    private String[] names = {"张三","李四","王五","你猜","张三","李四","王五","你猜","张三","李四","王五","你猜","张三","李四","王五","你猜"};
     @NonNull
     @Override
     public FriendsListHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

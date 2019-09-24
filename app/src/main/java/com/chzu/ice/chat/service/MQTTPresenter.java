@@ -33,6 +33,11 @@ public class MQTTPresenter implements IMQTTPresenter {
     }
 
     @Override
+    public void publish(String topic, String msg) {
+        imqttModel.publish(topic, msg);
+    }
+
+    @Override
     public void subscribeSucceed() {
         imqttView.showSubscribeSucceed();
     }
@@ -50,6 +55,16 @@ public class MQTTPresenter implements IMQTTPresenter {
     @Override
     public void connectFailed() {
         imqttView.showConnectFailed();
+    }
+
+    @Override
+    public void publishSucceed() {
+        imqttView.showPublishSucceed();
+    }
+
+    @Override
+    public void publishFailed() {
+        imqttView.showPublishFailed();
     }
 
 }

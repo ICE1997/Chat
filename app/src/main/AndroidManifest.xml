@@ -11,14 +11,15 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".activity.register.RegisterActivity"></activity>
-        <activity android:name=".activity.login.LoginActivity" />
-        <activity android:name=".activity.friends.FriendsActivity" />
-        <activity android:name=".activity.main.MainActivity">
+        <activity android:name=".activity.login.LoginActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".activity.friends.FriendsActivity" />
+        <activity android:name=".activity.main.ChatActivity">
         </activity>
 
         <service

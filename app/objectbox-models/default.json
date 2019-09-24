@@ -18,9 +18,21 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "3:4485645016916333781",
+      "lastPropertyId": "1:6568237428174830049",
+      "name": "Friends",
+      "properties": [
+        {
+          "id": "1:6568237428174830049",
+          "name": "id"
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "2:617710307068923659",
+  "lastEntityId": "3:4485645016916333781",
   "lastIndexId": "0:0",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",

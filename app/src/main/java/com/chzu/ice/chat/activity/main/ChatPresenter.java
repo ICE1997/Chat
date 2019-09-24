@@ -2,13 +2,13 @@ package com.chzu.ice.chat.activity.main;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
 
-public class MainPresenter implements IMainPresenter {
-    private IMainModel mainModel;
-    private IMainView mainView;
+public class ChatPresenter implements IChatPresenter {
+    private IChatModel mainModel;
+    private IChatView mainView;
 
-    public MainPresenter(IMainView mainView) throws MqttException {
+    public ChatPresenter(IChatView mainView) throws MqttException {
         this.mainView = mainView;
-        this.mainModel = new MainModel(this);
+        this.mainModel = new ChatModel(this);
 
     }
 
