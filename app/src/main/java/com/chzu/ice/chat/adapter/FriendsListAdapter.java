@@ -12,6 +12,12 @@ import com.chzu.ice.chat.R;
 
 public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListAdapter.FriendsListHolder> {
     private String[] names = {"张三","李四","王五","你猜","张三","李四","王五","你猜","张三","李四","王五","你猜","张三","李四","王五","你猜"};
+    private ItemClickListener itemClickListener;
+
+    public FriendsListAdapter(ItemClickListener itemClickListener) {
+        this.itemClickListener = itemClickListener;
+    }
+
     @NonNull
     @Override
     public FriendsListHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -34,7 +40,17 @@ public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListAdapter.
 
         FriendsListHolder(@NonNull View itemView) {
             super(itemView);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    itemClickListener.onClick();
+                }
+            });
             textView = itemView.findViewById(R.id.name);
         }
+    }
+
+    public interface ItemClickListener{
+        void onClick();
     }
 }
