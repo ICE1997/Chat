@@ -9,15 +9,17 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.chzu.ice.chat.R;
+import com.chzu.ice.chat.db.Friend;
 
-import java.util.HashMap;
+import java.util.List;
+
 
 public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListAdapter.FriendsListHolder> {
-    private String[] names = {"张三","李四","王五","你猜","张三","李四","王五","你猜","张三","李四","王五","你猜","张三","李四","王五","你猜"};
+    private List<Friend> friends;
     private ItemClickListener itemClickListener;
 
-    public FriendsListAdapter(ItemClickListener itemClickListener) {
-        this.itemClickListener = itemClickListener;
+    public FriendsListAdapter(List<Friend> friends) {
+        this.friends = friends;
     }
 
     @NonNull
@@ -29,12 +31,12 @@ public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull final FriendsListHolder holder, final int position) {
-        holder.textView.setText(names[position]);
+        holder.textView.setText(friends.get(position).getFName());
         if(itemClickListener!=null) {
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    itemClickListener.onClick(v,position,names[position]);
+                    itemClickListener.onClick(v,position,friends.get(position).getFName());
                 }
             });
         }
@@ -42,7 +44,7 @@ public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListAdapter.
 
     @Override
     public int getItemCount() {
-        return names.length;
+        return friends.size();
     }
 
     class FriendsListHolder extends RecyclerView.ViewHolder {
@@ -52,6 +54,11 @@ public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListAdapter.
             super(itemView);
             textView = itemView.findViewById(R.id.name);
         }
+    }
+
+
+    public void setItemClickListener(ItemClickListener itemClickListener) {
+        this.itemClickListener = itemClickListener;
     }
 
     public interface ItemClickListener{

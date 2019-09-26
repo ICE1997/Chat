@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "2:617710307068923659",
-      "lastPropertyId": "2:9064996871411837917",
+      "lastPropertyId": "3:754724969357956258",
       "name": "Message",
       "properties": [
         {
@@ -15,35 +15,87 @@
         {
           "id": "2:9064996871411837917",
           "name": "msg"
+        },
+        {
+          "id": "3:754724969357956258",
+          "name": "timestamp"
         }
       ],
       "relations": []
     },
     {
-      "id": "3:4485645016916333781",
-      "lastPropertyId": "1:6568237428174830049",
-      "name": "Friends",
+      "id": "4:8996123698728823618",
+      "lastPropertyId": "7:5132085235417844457",
+      "name": "UserAccount",
       "properties": [
         {
-          "id": "1:6568237428174830049",
+          "id": "1:4766130898233293130",
           "name": "id"
+        },
+        {
+          "id": "5:7311717151883107386",
+          "name": "UName"
+        },
+        {
+          "id": "6:473733068065507770",
+          "name": "UPwd"
+        },
+        {
+          "id": "7:5132085235417844457",
+          "name": "topic"
         }
       ],
-      "relations": []
+      "relations": [
+        {
+          "id": "1:6930762702532865587",
+          "name": "friends"
+        }
+      ]
+    },
+    {
+      "id": "5:846152409821477466",
+      "lastPropertyId": "4:8431516258301781067",
+      "name": "Friend",
+      "properties": [
+        {
+          "id": "1:1854145448121270252",
+          "name": "id"
+        },
+        {
+          "id": "3:4330134066881767158",
+          "name": "FName"
+        },
+        {
+          "id": "4:8431516258301781067",
+          "name": "FTopic"
+        }
+      ],
+      "relations": [
+        {
+          "id": "2:7711367231853760516",
+          "name": "messages"
+        }
+      ]
     }
   ],
-  "lastEntityId": "3:4485645016916333781",
+  "lastEntityId": "5:846152409821477466",
   "lastIndexId": "0:0",
-  "lastRelationId": "0:0",
+  "lastRelationId": "2:7711367231853760516",
   "lastSequenceId": "0:0",
   "modelVersion": 4,
   "modelVersionParserMinimum": 4,
   "retiredEntityUids": [
-    6193521859900162900
+    6193521859900162900,
+    4485645016916333781
   ],
   "retiredIndexUids": [],
   "retiredPropertyUids": [
-    6316002028619727836
+    6316002028619727836,
+    6568237428174830049,
+    2049780130441023680,
+    3834855495231018208,
+    8999739488034085792,
+    6334541916819769843
   ],
   "retiredRelationUids": [],
   "version": 1

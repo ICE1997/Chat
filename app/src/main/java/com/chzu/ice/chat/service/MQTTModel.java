@@ -9,6 +9,8 @@ import android.util.Log;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.chzu.ice.chat.App;
+import com.chzu.ice.chat.activity.friends.FriendsModel;
+import com.chzu.ice.chat.db.Friend;
 import com.chzu.ice.chat.db.Message;
 import com.chzu.ice.chat.utils.ObjectBoxHelper;
 
@@ -22,6 +24,7 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -33,13 +36,13 @@ public class MQTTModel implements IMQTTModel {
     private final String clientId = "device2";
     private MqttAsyncClient mClient;
     private MqttConnectOptions opt;
-    private String topic = "test2";
     private int qos = 2;
     private IMQTTPresenter imqttPresenter;
     private MqttCallback callback;
     private IMqttActionListener connectListener;
     private IMqttActionListener subscribeListener;
     private Box<Message> messageBox;
+    private String usrname;
 
     MQTTModel(IMQTTPresenter imqttPresenter) throws MqttException {
         this.imqttPresenter = imqttPresenter;
@@ -52,6 +55,7 @@ public class MQTTModel implements IMQTTModel {
         connectListener = new ConnectListener();
         subscribeListener = new SubscribeListener();
         registerSendMSGBroadcastReceiver();
+        registerSubscribeBroadcastReceiver();
     }
 
     @Override
@@ -79,13 +83,25 @@ public class MQTTModel implements IMQTTModel {
     }
 
     @Override
-    public void subscribe() throws MqttException {
-        mClient.subscribe(topic, qos, this, subscribeListener);
+    public void subscribe() {
+        if(!"".equals(this.usrname)) {
+            List<Friend> friends = new FriendsModel().getAllFriends(usrname);
+            if(!friends.isEmpty()) {
+                for(Friend friend:friends) {
+                    try {
+                        mClient.subscribe(friend.getFTopic(), qos, this, subscribeListener);
+                    } catch (MqttException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
     }
 
     @Override
     public void unsubscribe() throws MqttException {
-        mClient.unsubscribe(topic);
+//        mClient.unsubscribe(topic);
     }
 
     @Override
@@ -117,6 +133,19 @@ public class MQTTModel implements IMQTTModel {
         intent.putExtra("topic", topic);
         intent.putExtra("msg", msg);
         LocalBroadcastManager.getInstance(App.getApplication()).sendBroadcast(intent);
+    }
+
+    private void registerSubscribeBroadcastReceiver() {
+        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(App.getApplication());
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("SubscribeSignal");
+        localBroadcastManager.registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                MQTTModel.this.usrname = intent.getStringExtra("username");
+                subscribe();
+            }
+        }, intentFilter);
     }
 
     //发送信息
@@ -152,11 +181,7 @@ public class MQTTModel implements IMQTTModel {
         public void onSuccess(IMqttToken asyncActionToken) {
             Log.d(TAG, "run: 连接成功");
             imqttPresenter.connectSucceed();
-            try {
-                subscribe();
-            } catch (MqttException e) {
-                e.printStackTrace();
-            }
+//            subscribe();
         }
 
         @Override
@@ -191,11 +216,7 @@ public class MQTTModel implements IMQTTModel {
                 Log.d(TAG, "connectionLost: 连接丢失,重新连线");
                 if (mClient.isConnected()) {
                     Log.d(TAG, "run: 已重连接.");
-                    try {
-                        subscribe();
-                    } catch (MqttException e) {
-                        e.printStackTrace();
-                    }
+                    subscribe();
                     this.cancel();
                 } else {
                     connect();

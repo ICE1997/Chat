@@ -11,8 +11,8 @@ public class ChatPresenter implements IChatContract.Presenter {
     }
 
     @Override
-    public void publish(String s) {
-        chatModel.publish(s, new ChatModel.PublishCallback() {
+    public void publish(String s, String topic) {
+        chatModel.publish(s, topic, new ChatModel.PublishCallback() {
             @Override
             public void publishSucceed() {
                 chatView.showPublishSucceed();

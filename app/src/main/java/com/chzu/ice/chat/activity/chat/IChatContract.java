@@ -12,6 +12,6 @@ public interface IChatContract {
     }
 
     interface Presenter extends BasePresenter {
-        void publish(String s) throws MqttException;
+        void publish(String s,String topic) throws MqttException;
     }
 }

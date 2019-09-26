@@ -1,5 +1,6 @@
 package com.chzu.ice.chat.activity.login;
 
+import com.chzu.ice.chat.App;
 import com.chzu.ice.chat.db.UserAccount;
 import com.chzu.ice.chat.db.UserAccount_;
 import com.chzu.ice.chat.utils.ObjectBoxHelper;
@@ -15,7 +16,7 @@ class LoginModel {
 
     void login(String usr, String pwd, LoginCallback callback) {
         if(this.accountBox!=null) {
-            if(accountBox.query().equal(UserAccount_.usr,usr).equal(UserAccount_.pwd,pwd).build().find().isEmpty()){
+            if(accountBox.query().equal(UserAccount_.UName,usr).equal(UserAccount_.UPwd,pwd).build().find().isEmpty()){
              callback.isWrongPasswordOrNoUser();
             }else {
                 callback.loginSucceed();

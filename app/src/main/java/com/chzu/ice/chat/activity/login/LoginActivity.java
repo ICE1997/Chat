@@ -8,7 +8,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.chzu.ice.chat.App;
 import com.chzu.ice.chat.R;
 import com.chzu.ice.chat.activity.friends.FriendsActivity;
 import com.chzu.ice.chat.activity.register.RegisterActivity;
@@ -38,8 +40,16 @@ public class LoginActivity extends AppCompatActivity implements ILoginContract.V
     @Override
     public void showLoginSucceed() {
         ToastHelper.showToast(getApplicationContext(),"密码正确",Toast.LENGTH_SHORT);
+
+        Intent intent2 = new Intent("SubscribeSignal");
+        intent2.putExtra("username",usrEdt.getText().toString());
+        LocalBroadcastManager.getInstance(App.getApplication()).sendBroadcast(intent2);
+
         Intent intent = new Intent(this, FriendsActivity.class);
         startActivity(intent);
+        ((App)getApplication()).setCurrentUserName(usrEdt.getText().toString());
+
+
     }
 
     public void registerComponents() {

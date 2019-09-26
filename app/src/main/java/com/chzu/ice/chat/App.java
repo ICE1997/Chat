@@ -8,6 +8,7 @@ import com.chzu.ice.chat.utils.ObjectBoxHelper;
 
 public class App extends Application {
     private static Application application;
+    private String userName;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -18,6 +19,13 @@ public class App extends Application {
 
         Intent intent = new Intent(getApplicationContext(), MQTTService.class);
         startService(intent);
+    }
+
+    public void setCurrentUserName(String user){
+        this.userName = user;
+    }
+    public String getCurrentUserName() {
+        return userName;
     }
 
     public static Application getApplication() {

@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/UName/bin/env sh
 
 ##############################################################################
 ##
@@ -19,9 +19,9 @@ while [ -h "$PRG" ] ; do
         PRG=`dirname "$PRG"`"/$link"
     fi
 done
-SAVED="`pwd`"
+SAVED="`UPwd`"
 cd "`dirname \"$PRG\"`/" >/dev/null
-APP_HOME="`pwd -P`"
+APP_HOME="`UPwd -P`"
 cd "$SAVED" >/dev/null
 
 APP_NAME="Gradle"

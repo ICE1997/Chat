@@ -7,27 +7,36 @@ import io.objectbox.annotation.Id;
 public class UserAccount {
     @Id
     public long id;
-    public String usr;
-    public String pwd;
+    public String UName;
+    public String UPwd;
+    public String topic;
 
-    public UserAccount(String usr, String pwd) {
-        this.usr = usr;
-        this.pwd = pwd;
+    public UserAccount(String UName, String UPwd) {
+        this.UName = UName;
+        this.UPwd = UPwd;
     }
 
-    public String getUsr() {
-        return usr;
+    public String getUName() {
+        return UName;
     }
 
-    public void setUsr(String usr) {
-        this.usr = usr;
+    public void setUName(String UName) {
+        this.UName = UName;
     }
 
-    public String getPwd() {
-        return pwd;
+    public String getUPwd() {
+        return UPwd;
     }
 
-    public void setPwd(String pwd) {
-        this.pwd = pwd;
+    public void setUPwd(String UPwd) {
+        this.UPwd = UPwd;
+    }
+
+    public String getTopic() {
+        return topic;
+    }
+
+    public void setTopic(String topic) {
+        this.topic = topic;
     }
 }
