@@ -6,16 +6,11 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.chzu.ice.chat.App;
 
-import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-
 class ChatModel {
     private static final String TAG = ChatModel.class.getSimpleName();
-    private MqttAsyncClient mClient;
     private String topic = "test1";
-    private MqttConnectOptions opts;
 
-    void publish(final String s,PublishCallback callback) {
+    void publish(final String s, PublishCallback callback) {
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(App.getApplication());
         Intent intent = new Intent("sendMessage");
         intent.putExtra("msg", s);
@@ -26,6 +21,7 @@ class ChatModel {
 
     interface PublishCallback {
         void publishSucceed();
+
         void publishFailed();
     }
 }

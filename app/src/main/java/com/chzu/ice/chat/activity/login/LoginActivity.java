@@ -11,11 +11,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.chzu.ice.chat.R;
 import com.chzu.ice.chat.activity.friends.FriendsActivity;
+import com.chzu.ice.chat.activity.register.RegisterActivity;
 import com.chzu.ice.chat.utils.ToastHelper;
 
 public class LoginActivity extends AppCompatActivity implements ILoginContract.View {
     private ILoginContract.Presenter loginPresenter;
     private Button loginBtn;
+    private Button toRegisterBtn;
     private EditText usrEdt;
     private EditText pwdEdt;
 
@@ -41,13 +43,15 @@ public class LoginActivity extends AppCompatActivity implements ILoginContract.V
     }
 
     public void registerComponents() {
-        this.loginBtn = findViewById(R.id.loginBtn);
+        this.loginBtn = findViewById(R.id.registerBtn);
         this.usrEdt = findViewById(R.id.usrEdt);
         this.pwdEdt = findViewById(R.id.pwdEdt);
+        this.toRegisterBtn = findViewById(R.id.toRegisterBtn);
     }
 
     public void registerListener() {
-        this.loginBtn.setOnClickListener(new loginOnClickListener());
+        this.loginBtn.setOnClickListener(new LoginOnClickListener());
+        this.toRegisterBtn.setOnClickListener(new ToRegister());
     }
 
     @Override
@@ -55,12 +59,21 @@ public class LoginActivity extends AppCompatActivity implements ILoginContract.V
         this.loginPresenter = loginPresenter;
     }
 
-    private class loginOnClickListener implements View.OnClickListener{
+    private class LoginOnClickListener implements View.OnClickListener{
         @Override
         public void onClick(View view) {
             String usr = LoginActivity.this.usrEdt.getText().toString();
             String pwd = LoginActivity.this.pwdEdt.getText().toString();
             LoginActivity.this.loginPresenter.login(usr,pwd);
+        }
+    }
+
+    private class ToRegister implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+            startActivity(intent);
         }
     }
 }

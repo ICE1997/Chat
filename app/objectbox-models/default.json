@@ -30,9 +30,29 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "4:8996123698728823618",
+      "lastPropertyId": "3:3834855495231018208",
+      "name": "UserAccount",
+      "properties": [
+        {
+          "id": "1:4766130898233293130",
+          "name": "id"
+        },
+        {
+          "id": "2:2049780130441023680",
+          "name": "usr"
+        },
+        {
+          "id": "3:3834855495231018208",
+          "name": "pwd"
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "3:4485645016916333781",
+  "lastEntityId": "4:8996123698728823618",
   "lastIndexId": "0:0",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
