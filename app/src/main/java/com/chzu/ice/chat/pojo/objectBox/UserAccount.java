@@ -1,4 +1,4 @@
-package com.chzu.ice.chat.db;
+package com.chzu.ice.chat.pojo.objectBox;
 
 import io.objectbox.annotation.Entity;
 import io.objectbox.annotation.Id;
@@ -7,9 +7,9 @@ import io.objectbox.annotation.Id;
 public class UserAccount {
     @Id
     public long id;
-    public String UName;
-    public String UPwd;
-    public String topic;
+    private String UName;
+    private String UPwd;
+    private String topic;
 
     public UserAccount(String UName, String UPwd) {
         this.UName = UName;

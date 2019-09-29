@@ -1,16 +1,15 @@
-package com.chzu.ice.chat.db;
+package com.chzu.ice.chat.pojo.objectBox;
 
 import io.objectbox.annotation.Entity;
 import io.objectbox.annotation.Id;
-import io.objectbox.relation.ToMany;
 
 @Entity
-public class Friend {
+public class FriendRelation {
     @Id
     public long id;
-    public String FName;
-    public String MName;
-    public String FTopic;
+    private String FName;
+    private String MName;
+    private String FTopic;
 
     public String getFName() {
         return FName;

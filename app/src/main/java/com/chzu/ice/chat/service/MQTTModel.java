@@ -4,14 +4,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.session.MediaSession;
 import android.util.Log;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.chzu.ice.chat.App;
-import com.chzu.ice.chat.activity.friends.FriendsModel;
-import com.chzu.ice.chat.db.Friend;
-import com.chzu.ice.chat.db.Message;
+import com.chzu.ice.chat.pojo.objectBox.FriendRelation;
+import com.chzu.ice.chat.pojo.objectBox.Message;
 import com.chzu.ice.chat.utils.ObjectBoxHelper;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
@@ -24,16 +24,16 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 
 import io.objectbox.Box;
 
 public class MQTTModel implements IMQTTModel {
     private final String TAG = MQTTModel.class.getSimpleName();
     private final String broker = "ws://47.106.132.194:8083";
-    private final String clientId = "device2";
+    private final String clientId = UUID.randomUUID().toString().replaceAll("-","");
     private MqttAsyncClient mClient;
     private MqttConnectOptions opt;
     private int qos = 2;
@@ -42,11 +42,13 @@ public class MQTTModel implements IMQTTModel {
     private IMqttActionListener connectListener;
     private IMqttActionListener subscribeListener;
     private Box<Message> messageBox;
+    private Box<FriendRelation> friendRelationBox;
     private String usrname;
 
     MQTTModel(IMQTTPresenter imqttPresenter) throws MqttException {
         this.imqttPresenter = imqttPresenter;
         messageBox = ObjectBoxHelper.get().boxFor(Message.class);
+        friendRelationBox = ObjectBoxHelper.get().boxFor(FriendRelation.class);
         mClient = new MqttAsyncClient(broker, clientId, new MemoryPersistence());
         opt = new MqttConnectOptions();
         opt.setCleanSession(false);
@@ -83,18 +85,15 @@ public class MQTTModel implements IMQTTModel {
     }
 
     @Override
-    public void subscribe() {
-        if(!"".equals(this.usrname)) {
-            List<Friend> friends = new FriendsModel().getAllFriends(usrname);
-            if(!friends.isEmpty()) {
-                for(Friend friend:friends) {
-                    try {
-                        mClient.subscribe(friend.getFTopic(), qos, this, subscribeListener);
-                    } catch (MqttException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
+    public void subscribe() throws MqttException {
+
+        String topic = ((App) App.getApplication()).getMyTopic();
+
+        Log.d(TAG, "subscribe: " + topic);
+
+        if (topic != null && !"".equals(topic)) {
+            mClient.subscribe(topic, qos, this, subscribeListener);
+            Log.d(TAG, "subscribe: 订阅成功:" + topic);
         }
 
     }
@@ -143,7 +142,11 @@ public class MQTTModel implements IMQTTModel {
             @Override
             public void onReceive(Context context, Intent intent) {
                 MQTTModel.this.usrname = intent.getStringExtra("username");
-                subscribe();
+                try {
+                    subscribe();
+                } catch (MqttException e) {
+                    e.printStackTrace();
+                }
             }
         }, intentFilter);
     }
@@ -181,7 +184,6 @@ public class MQTTModel implements IMQTTModel {
         public void onSuccess(IMqttToken asyncActionToken) {
             Log.d(TAG, "run: 连接成功");
             imqttPresenter.connectSucceed();
-//            subscribe();
         }
 
         @Override
@@ -216,7 +218,11 @@ public class MQTTModel implements IMQTTModel {
                 Log.d(TAG, "connectionLost: 连接丢失,重新连线");
                 if (mClient.isConnected()) {
                     Log.d(TAG, "run: 已重连接.");
-                    subscribe();
+                    try {
+                        subscribe();
+                    } catch (MqttException e) {
+                        e.printStackTrace();
+                    }
                     this.cancel();
                 } else {
                     connect();
@@ -231,8 +237,8 @@ public class MQTTModel implements IMQTTModel {
 
         @Override
         public void messageArrived(String topic, MqttMessage message) throws Exception {
-//            Log.d(TAG, "messageArrived: topic: from " + topic);
-//            Log.d(TAG, "messageArrived: msg;" + message.toString());
+            Log.d(TAG, "messageArrived: topic: from " + topic);
+            Log.d(TAG, "messageArrived: msg;" + message.toString());
             broadcastMessage(topic, message.toString());
         }
 

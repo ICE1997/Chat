@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "2:617710307068923659",
-      "lastPropertyId": "3:754724969357956258",
+      "lastPropertyId": "5:4491561112644858527",
       "name": "Message",
       "properties": [
         {
@@ -19,6 +19,14 @@
         {
           "id": "3:754724969357956258",
           "name": "timestamp"
+        },
+        {
+          "id": "4:9035282256981393350",
+          "name": "fromU"
+        },
+        {
+          "id": "5:4491561112644858527",
+          "name": "toU"
         }
       ],
       "relations": []
@@ -45,16 +53,11 @@
           "name": "topic"
         }
       ],
-      "relations": [
-        {
-          "id": "1:6930762702532865587",
-          "name": "friends"
-        }
-      ]
+      "relations": []
     },
     {
       "id": "5:846152409821477466",
-      "lastPropertyId": "4:8431516258301781067",
+      "lastPropertyId": "5:6813462969828249919",
       "name": "Friend",
       "properties": [
         {
@@ -68,14 +71,13 @@
         {
           "id": "4:8431516258301781067",
           "name": "FTopic"
+        },
+        {
+          "id": "5:6813462969828249919",
+          "name": "MName"
         }
       ],
-      "relations": [
-        {
-          "id": "2:7711367231853760516",
-          "name": "messages"
-        }
-      ]
+      "relations": []
     }
   ],
   "lastEntityId": "5:846152409821477466",
@@ -97,6 +99,9 @@
     8999739488034085792,
     6334541916819769843
   ],
-  "retiredRelationUids": [],
+  "retiredRelationUids": [
+    6930762702532865587,
+    7711367231853760516
+  ],
   "version": 1
 }

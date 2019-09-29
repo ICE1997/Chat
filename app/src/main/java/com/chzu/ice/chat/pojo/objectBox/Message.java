@@ -1,4 +1,4 @@
-package com.chzu.ice.chat.db;
+package com.chzu.ice.chat.pojo.objectBox;
 
 import io.objectbox.annotation.Entity;
 import io.objectbox.annotation.Id;

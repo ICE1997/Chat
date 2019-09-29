@@ -11,8 +11,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -22,10 +20,10 @@ import com.chzu.ice.chat.App;
 import com.chzu.ice.chat.R;
 import com.chzu.ice.chat.activity.BaseActivity;
 import com.chzu.ice.chat.adapter.ChatViewAdapter;
-import com.chzu.ice.chat.db.Friend;
-import com.chzu.ice.chat.db.Friend_;
-import com.chzu.ice.chat.db.Message;
-import com.chzu.ice.chat.db.Message_;
+import com.chzu.ice.chat.pojo.objectBox.FriendRelation;
+import com.chzu.ice.chat.pojo.objectBox.FriendRelation_;
+import com.chzu.ice.chat.pojo.objectBox.Message;
+import com.chzu.ice.chat.pojo.objectBox.Message_;
 import com.chzu.ice.chat.utils.ObjectBoxHelper;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -70,7 +68,7 @@ public class ChatActivity extends BaseActivity implements IChatContract.View {
 
     private void initData() {
         this.messageBox = ObjectBoxHelper.get().boxFor(Message.class);
-        List<Message> msgs = messageBox.query().equal(Message_.toU,nameTitle).build().find();
+        List<Message> msgs = messageBox.query().equal(Message_.toU,((App)App.getApplication()).getCurrentUserName()).build().find();
         chatViewAdapter = new ChatViewAdapter(msgs);
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
@@ -107,8 +105,8 @@ public class ChatActivity extends BaseActivity implements IChatContract.View {
             @Override
             public void onReceive(Context context, Intent intent) {
                 Message message = new Message();
-                message.setFromU(((App)getApplication()).getCurrentUserName());
-                message.setToU(nameTitle);
+                message.setToU(((App)getApplication()).getCurrentUserName());
+                message.setFromU(nameTitle);
                 message.setTimestamp(new Date().getTime());
                 message.setMsg(intent.getStringExtra("msg"));
                 messageBox.put(message);
@@ -120,7 +118,7 @@ public class ChatActivity extends BaseActivity implements IChatContract.View {
 
     @Override
     public void showPublishSucceed() {
-
+        this.input.setText("");
     }
 
     @Override
@@ -144,10 +142,10 @@ public class ChatActivity extends BaseActivity implements IChatContract.View {
             if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER && keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
                 Log.d(TAG, "onKey: " + input.getText());
                 try {
-                    Box<Friend> friendBox = ObjectBoxHelper.get().boxFor(Friend.class);
-                    Friend friend = friendBox.query().equal(Friend_.FName,nameTitle).build().findFirst();
-                    if(friend!=null) {
-                        chatPresenter.publish(input.getText().toString(),friend.getFTopic());
+                    Box<FriendRelation> friendBox = ObjectBoxHelper.get().boxFor(FriendRelation.class);
+                    FriendRelation friendRelation = friendBox.query().equal(FriendRelation_.FName,nameTitle).build().findFirst();
+                    if(friendRelation !=null) {
+                        chatPresenter.publish(input.getText().toString(), friendRelation.getFTopic());
                     }
                 } catch (MqttException e) {
                     e.printStackTrace();

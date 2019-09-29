@@ -14,8 +14,13 @@ public class LoginPresenter implements ILoginContract.Presenter {
     public void login(String usr, String pwd) {
         loginModel.login(usr, pwd, new LoginModel.LoginCallback() {
             @Override
-            public void isWrongPasswordOrNoUser() {
-                loginView.showWrongPasswordOrNoUser();
+            public void noSuchUser() {
+                loginView.showNoSuchUser();
+            }
+
+            @Override
+            public void wrongPassword() {
+                loginView.showWrongPassword();
             }
 
             @Override

@@ -9,6 +9,8 @@ import com.chzu.ice.chat.utils.ObjectBoxHelper;
 public class App extends Application {
     private static Application application;
     private String userName;
+    private String myTopic;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -26,6 +28,14 @@ public class App extends Application {
     }
     public String getCurrentUserName() {
         return userName;
+    }
+
+    public String getMyTopic() {
+        return myTopic;
+    }
+
+    public void setMyTopic(String myTopic) {
+        this.myTopic = myTopic;
     }
 
     public static Application getApplication() {

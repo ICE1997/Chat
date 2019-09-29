@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.chzu.ice.chat.R;
-import com.chzu.ice.chat.db.Message;
+import com.chzu.ice.chat.pojo.objectBox.Message;
 
 import java.util.List;
 

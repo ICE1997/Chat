@@ -1,8 +1,7 @@
-package com.chzu.ice.chat.activity.friends;
+package com.chzu.ice.chat.activity.friendsRelations;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,7 +20,7 @@ import com.chzu.ice.chat.App;
 import com.chzu.ice.chat.R;
 import com.chzu.ice.chat.activity.chat.ChatActivity;
 import com.chzu.ice.chat.adapter.FriendsListAdapter;
-import com.chzu.ice.chat.db.Friend;
+import com.chzu.ice.chat.pojo.objectBox.FriendRelation;
 import com.chzu.ice.chat.utils.ToastHelper;
 import com.google.zxing.WriterException;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -36,14 +35,17 @@ public class FriendsActivity extends AppCompatActivity implements IFriendsContra
     private Toolbar friendsToolbar;
     private FrameLayout qrcodeBcg;
     private ImageView qrcodeImg;
+    private String usr;
+    private FriendsListAdapter friendsListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friends);
-        new FriendsPresenter(this, new FriendsModel());
         registerComponents();
         registerListener();
+        new FriendsPresenter(this, new FriendsModel());
+        initData();
         initSurface();
     }
 
@@ -52,16 +54,14 @@ public class FriendsActivity extends AppCompatActivity implements IFriendsContra
         friendsToolbar = findViewById(R.id.friendsToolbar);
         qrcodeBcg = findViewById(R.id.qrcodeBcg);
         qrcodeImg = findViewById(R.id.qrcodeImg);
+    }
 
-
-        String usr = ((App)getApplication()).getCurrentUserName();
-        Log.d(TAG, "registerComponents: " + usr);
-        List<Friend> friends = friendsPresenter.getAllFriends(usr);
-        FriendsListAdapter friendsListAdapter = new FriendsListAdapter(friends);
+    private void initData() {
+        this.usr = ((App) getApplication()).getCurrentUserName();
+        this.friendsListAdapter = new FriendsListAdapter();
         friendsListAdapter.setItemClickListener(new FriendsListAdapter.ItemClickListener() {
             @Override
             public void onClick(View v, int i, String s) {
-                Log.d(TAG, "onClick: you Clicked me!" + s);
                 Intent intent = new Intent(FriendsActivity.this, ChatActivity.class);
                 intent.putExtra("nameTitle", s);
                 startActivity(intent);
@@ -69,6 +69,14 @@ public class FriendsActivity extends AppCompatActivity implements IFriendsContra
         });
         LinearLayoutManager llm = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         friendsList.setLayoutManager(llm);
+
+        friendsPresenter.loadAllFriends(usr, new FriendsModel.LoadFriendCallback() {
+            @Override
+            public void onCompleted(List<FriendRelation> relations) {
+                friendsListAdapter.setFriendRelations(relations);
+            }
+        });
+
         friendsList.setAdapter(friendsListAdapter);
     }
 
@@ -150,5 +158,10 @@ public class FriendsActivity extends AppCompatActivity implements IFriendsContra
     @Override
     public void showAddFriendSucceed() {
         ToastHelper.showToast(this, "添加好友成功", Toast.LENGTH_SHORT);
+    }
+
+    @Override
+    public void showLoadSucceed(List<FriendRelation> relations) {
+
     }
 }

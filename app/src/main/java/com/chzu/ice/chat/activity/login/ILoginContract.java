@@ -5,7 +5,8 @@ import com.chzu.ice.chat.activity.BaseView;
 
 public interface ILoginContract {
     interface View extends BaseView<Presenter> {
-        void showWrongPasswordOrNoUser();
+        void showNoSuchUser();
+        void showWrongPassword();
         void showLoginSucceed();
     }
 

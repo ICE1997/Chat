@@ -1,8 +1,8 @@
-package com.chzu.ice.chat.activity.friends;
+package com.chzu.ice.chat.activity.friendsRelations;
 
 import android.graphics.Bitmap;
 
-import com.chzu.ice.chat.db.Friend;
+import com.chzu.ice.chat.pojo.objectBox.FriendRelation;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
@@ -47,7 +47,7 @@ class FriendsPresenter implements IFriendsContract.Presenter {
     }
 
     @Override
-    public List<Friend> getAllFriends(String usr) {
-        return friendsModel.getAllFriends(usr);
+    public void loadAllFriends(String usr,FriendsModel.LoadFriendCallback callback) {
+        friendsModel.loadAllFriends(usr,callback);
     }
 }

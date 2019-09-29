@@ -12,7 +12,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.chzu.ice.chat.App;
 import com.chzu.ice.chat.R;
-import com.chzu.ice.chat.activity.friends.FriendsActivity;
+import com.chzu.ice.chat.activity.friendsRelations.FriendsActivity;
 import com.chzu.ice.chat.activity.register.RegisterActivity;
 import com.chzu.ice.chat.utils.ToastHelper;
 
@@ -29,26 +29,34 @@ public class LoginActivity extends AppCompatActivity implements ILoginContract.V
         setContentView(R.layout.activity_login);
         registerComponents();
         registerListener();
-        new LoginPresenter(this,new LoginModel());
+        new LoginPresenter(this, new LoginModel());
     }
 
     @Override
-    public void showWrongPasswordOrNoUser() {
-        ToastHelper.showToast(getApplicationContext(), "密码错误或无此用户.", Toast.LENGTH_SHORT);
+    public void showNoSuchUser() {
+        ToastHelper.showToast(getApplicationContext(), "无此用户.", Toast.LENGTH_SHORT);
+    }
+
+    @Override
+    public void showWrongPassword() {
+        ToastHelper.showToast(getApplicationContext(), "密码错误.", Toast.LENGTH_SHORT);
     }
 
     @Override
     public void showLoginSucceed() {
-        ToastHelper.showToast(getApplicationContext(),"密码正确",Toast.LENGTH_SHORT);
+        ToastHelper.showToast(getApplicationContext(), "密码正确", Toast.LENGTH_SHORT);
 
-        Intent intent2 = new Intent("SubscribeSignal");
-        intent2.putExtra("username",usrEdt.getText().toString());
-        LocalBroadcastManager.getInstance(App.getApplication()).sendBroadcast(intent2);
 
         Intent intent = new Intent(this, FriendsActivity.class);
         startActivity(intent);
-        ((App)getApplication()).setCurrentUserName(usrEdt.getText().toString());
+        ((App) getApplication()).setCurrentUserName(usrEdt.getText().toString());
 
+
+        Intent intent2 = new Intent("SubscribeSignal");
+        intent2.putExtra("username", usrEdt.getText().toString());
+        LocalBroadcastManager.getInstance(App.getApplication()).sendBroadcast(intent2);
+
+        this.finish();
 
     }
 
@@ -69,12 +77,12 @@ public class LoginActivity extends AppCompatActivity implements ILoginContract.V
         this.loginPresenter = loginPresenter;
     }
 
-    private class LoginOnClickListener implements View.OnClickListener{
+    private class LoginOnClickListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
             String usr = LoginActivity.this.usrEdt.getText().toString();
             String pwd = LoginActivity.this.pwdEdt.getText().toString();
-            LoginActivity.this.loginPresenter.login(usr,pwd);
+            LoginActivity.this.loginPresenter.login(usr, pwd);
         }
     }
 

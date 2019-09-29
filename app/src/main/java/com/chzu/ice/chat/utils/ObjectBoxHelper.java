@@ -3,7 +3,7 @@ package com.chzu.ice.chat.utils;
 import android.content.Context;
 import android.util.Log;
 
-import com.chzu.ice.chat.db.MyObjectBox;
+import com.chzu.ice.chat.pojo.objectBox.MyObjectBox;
 
 import io.objectbox.BoxStore;
 import io.objectbox.android.AndroidObjectBrowser;
