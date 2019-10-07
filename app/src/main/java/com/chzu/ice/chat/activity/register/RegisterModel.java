@@ -2,7 +2,7 @@ package com.chzu.ice.chat.activity.register;
 
 import com.chzu.ice.chat.pojo.json.GResponse;
 import com.chzu.ice.chat.pojo.json.GUserAccount;
-import com.chzu.ice.chat.utils.AppConfig;
+import com.chzu.ice.chat.config.AppConfig;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -30,10 +30,10 @@ class RegisterModel {
             @Override
             public void run() {
                 Gson gson = new Gson();
-                GUserAccount gUserAccount = new GUserAccount(usr, psw, "usr" + UUID.randomUUID().toString().replaceAll("-", ""));
+                GUserAccount gUserAccount = new GUserAccount(usr, psw);
                 String act = gson.toJson(gUserAccount);
                 RequestBody requestBody = RequestBody.create(JSON, act);
-                Request request = new Request.Builder().url(AppConfig.registerAPI).post(requestBody).build();
+                Request request = new Request.Builder().url(AppConfig.REGISTER_API).post(requestBody).build();
                 try {
                     Response response = okHttpClient.newCall(request).execute();
                     String respS = Objects.requireNonNull(response.body()).string();

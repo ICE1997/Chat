@@ -20,15 +20,17 @@ import com.chzu.ice.chat.App;
 import com.chzu.ice.chat.R;
 import com.chzu.ice.chat.activity.BaseActivity;
 import com.chzu.ice.chat.adapter.ChatViewAdapter;
+import com.chzu.ice.chat.config.AppConfig;
+import com.chzu.ice.chat.config.MQTTConfig;
 import com.chzu.ice.chat.pojo.objectBox.FriendRelation;
 import com.chzu.ice.chat.pojo.objectBox.FriendRelation_;
 import com.chzu.ice.chat.pojo.objectBox.Message;
 import com.chzu.ice.chat.pojo.objectBox.Message_;
 import com.chzu.ice.chat.utils.ObjectBoxHelper;
+import com.chzu.ice.chat.utils.SPHelper;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
 
-import java.util.Date;
 import java.util.List;
 
 import io.objectbox.Box;
@@ -42,15 +44,15 @@ public class ChatActivity extends BaseActivity implements IChatContract.View {
     private ChatViewAdapter chatViewAdapter;
     private Toolbar chatToolbar;
     private TextView chatTitle;
-    private String nameTitle;
+    private String friendName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-        retrieveDataFromLastAct();
         registerComponents();
         registerInputListener();
+        retrieveDataFromLastAct();
         registerBroadcastReceiver();
         new ChatPresenter(this, new ChatModel());
         initData();
@@ -63,26 +65,27 @@ public class ChatActivity extends BaseActivity implements IChatContract.View {
     }
 
     private void retrieveDataFromLastAct() {
-        this.nameTitle = getIntent().getStringExtra("nameTitle");
+        this.friendName = getIntent().getStringExtra("f_name");
+        Log.d(TAG, "retrieveDataFromLastAct: FriendName:" + friendName);
     }
 
     private void initData() {
         this.messageBox = ObjectBoxHelper.get().boxFor(Message.class);
-        List<Message> msgs = messageBox.query().equal(Message_.toU,((App)App.getApplication()).getCurrentUserName()).build().find();
+        String usr = new SPHelper(getApplication(), AppConfig.SP_CONFIG_ADDRESS_LOGIN_INFO).getString(AppConfig.SP_CONFIG_KEY_SIGNED_IN_USER, "");
+        List<Message> msgs = messageBox.query().equal(Message_.toU, usr).build().find();
         chatViewAdapter = new ChatViewAdapter(msgs);
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         chatView.setLayoutManager(llm);
         chatView.setAdapter(chatViewAdapter);
 
-
-        if (nameTitle != null) {
-            this.chatTitle.setText(nameTitle);
+        if (friendName != null) {
+            this.chatTitle.setText(friendName);
         }
     }
 
     private void initSurface() {
-        chatView.scrollToPosition((int) messageBox.count());
+//        chatView.scrollToPosition((int) messageBox.count());
         setBackArrow(this.chatToolbar);
     }
 
@@ -100,18 +103,16 @@ public class ChatActivity extends BaseActivity implements IChatContract.View {
     private void registerBroadcastReceiver() {
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(getApplicationContext());
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("newMessage");
+        intentFilter.addAction(MQTTConfig.SIGNAL_RECEIVE_MESSAGE);
         localBroadcastManager.registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 Message message = new Message();
-                message.setToU(((App)getApplication()).getCurrentUserName());
-                message.setFromU(nameTitle);
-                message.setTimestamp(new Date().getTime());
-                message.setMsg(intent.getStringExtra("msg"));
-                messageBox.put(message);
+                message.setToU((((App) getApplication()).getSignedInUsername()));
+                message.setFromU("1");
+                message.setMsg(intent.getStringExtra(MQTTConfig.EXTRA_RECEIVE_MESSAGE_MESSAGE));
                 chatViewAdapter.add(message);
-                chatView.smoothScrollToPosition((int) messageBox.count());
+//                chatView.smoothScrollToPosition((int) messageBox.count());
             }
         }, intentFilter);
     }
@@ -143,9 +144,11 @@ public class ChatActivity extends BaseActivity implements IChatContract.View {
                 Log.d(TAG, "onKey: " + input.getText());
                 try {
                     Box<FriendRelation> friendBox = ObjectBoxHelper.get().boxFor(FriendRelation.class);
-                    FriendRelation friendRelation = friendBox.query().equal(FriendRelation_.FName,nameTitle).build().findFirst();
-                    if(friendRelation !=null) {
+                    FriendRelation friendRelation = friendBox.query().equal(FriendRelation_.FName, friendName).build().findFirst();
+                    if (friendRelation != null) {
                         chatPresenter.publish(input.getText().toString(), friendRelation.getFTopic());
+                    }else {
+                        Log.e(TAG, "onKey: FriendRelation is NULL");
                     }
                 } catch (MqttException e) {
                     e.printStackTrace();

@@ -11,11 +11,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.chzu.ice.chat.R;
 import com.chzu.ice.chat.pojo.objectBox.FriendRelation;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
 public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListAdapter.FriendsListHolder> {
-    private List<FriendRelation> friendRelations;
+    private List<FriendRelation> friendRelations = new ArrayList<>();
     private ItemClickListener itemClickListener;
 
     public FriendsListAdapter() {
@@ -56,6 +57,7 @@ public class FriendsListAdapter extends RecyclerView.Adapter<FriendsListAdapter.
 
     public void setFriendRelations(List<FriendRelation> friendRelations) {
         this.friendRelations = friendRelations;
+//        this.notifyDataSetChanged();
     }
 
     public void setItemClickListener(ItemClickListener itemClickListener) {

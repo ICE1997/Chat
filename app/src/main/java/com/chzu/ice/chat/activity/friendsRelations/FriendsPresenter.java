@@ -22,8 +22,7 @@ class FriendsPresenter implements IFriendsContract.Presenter {
     @Override
     public Bitmap generateQRCode(String s) throws WriterException {
         BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
-        Bitmap bitmap = barcodeEncoder.encodeBitmap(s, BarcodeFormat.QR_CODE, 600, 600);
-        return bitmap;
+        return barcodeEncoder.encodeBitmap(s, BarcodeFormat.QR_CODE, 600, 600);
     }
 
     @Override
@@ -47,7 +46,7 @@ class FriendsPresenter implements IFriendsContract.Presenter {
     }
 
     @Override
-    public void loadAllFriends(String usr,FriendsModel.LoadFriendCallback callback) {
-        friendsModel.loadAllFriends(usr,callback);
+    public List<FriendRelation> loadAllFriends() {
+        return friendsModel.loadAllFriends();
     }
 }

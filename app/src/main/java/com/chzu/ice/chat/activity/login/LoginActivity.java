@@ -14,6 +14,8 @@ import com.chzu.ice.chat.App;
 import com.chzu.ice.chat.R;
 import com.chzu.ice.chat.activity.friendsRelations.FriendsActivity;
 import com.chzu.ice.chat.activity.register.RegisterActivity;
+import com.chzu.ice.chat.config.AppConfig;
+import com.chzu.ice.chat.config.MQTTConfig;
 import com.chzu.ice.chat.utils.ToastHelper;
 
 public class LoginActivity extends AppCompatActivity implements ILoginContract.View {
@@ -46,15 +48,15 @@ public class LoginActivity extends AppCompatActivity implements ILoginContract.V
     public void showLoginSucceed() {
         ToastHelper.showToast(getApplicationContext(), "密码正确", Toast.LENGTH_SHORT);
 
-
         Intent intent = new Intent(this, FriendsActivity.class);
         startActivity(intent);
-        ((App) getApplication()).setCurrentUserName(usrEdt.getText().toString());
 
+        Intent connect = new Intent(MQTTConfig.SIGNAL_CONNECT);
+        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(connect);
 
-        Intent intent2 = new Intent("SubscribeSignal");
-        intent2.putExtra("username", usrEdt.getText().toString());
-        LocalBroadcastManager.getInstance(App.getApplication()).sendBroadcast(intent2);
+        Intent subscribe = new Intent(MQTTConfig.SIGNAL_SUBSCRIBE);
+        subscribe.putExtra(MQTTConfig.EXTRA_SUBSCRIBE_TOPIC, ((App) getApplication()).getSignedInUserTopic());
+        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(subscribe);
 
         this.finish();
 
@@ -87,7 +89,6 @@ public class LoginActivity extends AppCompatActivity implements ILoginContract.V
     }
 
     private class ToRegister implements View.OnClickListener {
-
         @Override
         public void onClick(View v) {
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);

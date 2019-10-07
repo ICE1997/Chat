@@ -21,6 +21,6 @@ public interface IFriendsContract {
     interface Presenter extends BasePresenter {
         Bitmap generateQRCode(String s) throws WriterException;
         void addFriend(String mName,String fName);
-        void loadAllFriends(String usr,FriendsModel.LoadFriendCallback callback);
+        List<FriendRelation> loadAllFriends();
     }
 }
