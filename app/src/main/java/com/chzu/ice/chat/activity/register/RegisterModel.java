@@ -1,7 +1,7 @@
 package com.chzu.ice.chat.activity.register;
 
-import com.chzu.ice.chat.pojo.json.GBaseResponse;
-import com.chzu.ice.chat.pojo.json.GUserAccount;
+import com.chzu.ice.chat.pojo.gson.resp.BaseResponse;
+import com.chzu.ice.chat.pojo.gson.GUserAccount;
 import com.chzu.ice.chat.config.AppConfig;
 import com.google.gson.Gson;
 
@@ -36,7 +36,7 @@ class RegisterModel {
                 try {
                     Response response = okHttpClient.newCall(request).execute();
                     String respS = Objects.requireNonNull(response.body()).string();
-                    GBaseResponse respJ = gson.fromJson(respS, GBaseResponse.class);
+                    BaseResponse respJ = gson.fromJson(respS, BaseResponse.class);
                     switch (respJ.code) {
                         case "10101":
                             callback.registerSucceed();

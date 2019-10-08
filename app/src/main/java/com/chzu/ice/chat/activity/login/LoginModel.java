@@ -1,9 +1,9 @@
 package com.chzu.ice.chat.activity.login;
 
-import com.chzu.ice.chat.pojo.json.GLoginRep;
-import com.chzu.ice.chat.pojo.json.GBaseResponse;
-import com.chzu.ice.chat.pojo.json.GUserAccount;
+import com.chzu.ice.chat.pojo.gson.GLoginRep;
+import com.chzu.ice.chat.pojo.gson.resp.BaseResponse;
 import com.chzu.ice.chat.config.AppConfig;
+import com.chzu.ice.chat.pojo.gson.req.LoginReq;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -29,14 +29,13 @@ class LoginModel {
             @Override
             public void run() {
                 Gson gson = new Gson();
-                GUserAccount gUserAccount = new GUserAccount(usr, pwd);
-                String act = gson.toJson(gUserAccount);
-                RequestBody requestBody = RequestBody.create(JSON, act);
+                String loginReqJson = gson.toJson(new LoginReq(usr, pwd));
+                RequestBody requestBody = RequestBody.create(JSON, loginReqJson);
                 Request request = new Request.Builder().url(AppConfig.LOGIN_API).post(requestBody).build();
                 try {
                     Response response = okHttpClient.newCall(request).execute();
                     String respS = Objects.requireNonNull(response.body()).string();
-                    GBaseResponse<GLoginRep> respJ = gson.fromJson(respS, new TypeToken<GBaseResponse<GLoginRep>>() {
+                    BaseResponse<GLoginRep> respJ = gson.fromJson(respS, new TypeToken<BaseResponse<GLoginRep>>() {
                     }.getType());
 
                     switch (respJ.code) {

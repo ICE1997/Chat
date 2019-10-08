@@ -1,4 +1,4 @@
-package com.chzu.ice.chat.pojo.json;
+package com.chzu.ice.chat.pojo.gson;
 
 public class GUserAccount {
     public String username;
