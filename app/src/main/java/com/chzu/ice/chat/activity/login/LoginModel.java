@@ -1,7 +1,7 @@
 package com.chzu.ice.chat.activity.login;
 
 import com.chzu.ice.chat.pojo.json.GLoginRep;
-import com.chzu.ice.chat.pojo.json.GResponse;
+import com.chzu.ice.chat.pojo.json.GBaseResponse;
 import com.chzu.ice.chat.pojo.json.GUserAccount;
 import com.chzu.ice.chat.config.AppConfig;
 import com.google.gson.Gson;
@@ -36,7 +36,7 @@ class LoginModel {
                 try {
                     Response response = okHttpClient.newCall(request).execute();
                     String respS = Objects.requireNonNull(response.body()).string();
-                    GResponse<GLoginRep> respJ = gson.fromJson(respS, new TypeToken<GResponse<GLoginRep>>() {
+                    GBaseResponse<GLoginRep> respJ = gson.fromJson(respS, new TypeToken<GBaseResponse<GLoginRep>>() {
                     }.getType());
 
                     switch (respJ.code) {

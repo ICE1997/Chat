@@ -89,7 +89,6 @@ public class MQTTService extends Service {
 
     public void subscribe(String topic) throws MqttException {
         mClient.subscribe(topic, MQTTConfig.QOS, this, subscribeListener);
-        Log.d(TAG, "subscribe: 订阅成功:" + topic);
     }
 
     public void unsubscribe() throws MqttException {
@@ -286,7 +285,7 @@ public class MQTTService extends Service {
 
         @Override
         public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-            Log.d(TAG, "onSuccess: 订阅失败");
+            Log.d(TAG, "onFailure: 订阅失败,"+exception.getLocalizedMessage());
             showSubscribeFailed();
         }
     }
@@ -300,11 +299,7 @@ public class MQTTService extends Service {
                 Log.d(TAG, "connectionLost: 连接丢失,重新连线");
                 if (mClient.isConnected()) {
                     Log.d(TAG, "run: 已重连接.");
-                    try {
-                        subscribe("");
-                    } catch (MqttException e) {
-                        e.printStackTrace();
-                    }
+                    sendConnectSucceedSignal();
                     this.cancel();
                 } else {
                     connect();

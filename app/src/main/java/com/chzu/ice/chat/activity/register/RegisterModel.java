@@ -1,13 +1,12 @@
 package com.chzu.ice.chat.activity.register;
 
-import com.chzu.ice.chat.pojo.json.GResponse;
+import com.chzu.ice.chat.pojo.json.GBaseResponse;
 import com.chzu.ice.chat.pojo.json.GUserAccount;
 import com.chzu.ice.chat.config.AppConfig;
 import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.util.Objects;
-import java.util.UUID;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -37,7 +36,7 @@ class RegisterModel {
                 try {
                     Response response = okHttpClient.newCall(request).execute();
                     String respS = Objects.requireNonNull(response.body()).string();
-                    GResponse respJ = gson.fromJson(respS, GResponse.class);
+                    GBaseResponse respJ = gson.fromJson(respS, GBaseResponse.class);
                     switch (respJ.code) {
                         case "10101":
                             callback.registerSucceed();

@@ -5,7 +5,7 @@ import android.util.Log;
 import com.chzu.ice.chat.App;
 import com.chzu.ice.chat.pojo.json.GRepFriendRelation;
 import com.chzu.ice.chat.pojo.json.GReqFriendRelation;
-import com.chzu.ice.chat.pojo.json.GResponse;
+import com.chzu.ice.chat.pojo.json.GBaseResponse;
 import com.chzu.ice.chat.pojo.objectBox.FriendRelation;
 import com.chzu.ice.chat.pojo.objectBox.FriendRelation_;
 import com.chzu.ice.chat.pojo.objectBox.UserAccount;
@@ -55,7 +55,7 @@ class FriendsModel {
             Response response = okHttpClient.newCall(request).execute();
             String respS = Objects.requireNonNull(response.body()).string();
             Log.d(TAG, "run: " + respS);
-            GResponse<List<GRepFriendRelation>> gRelations = gson.fromJson(respS, new TypeToken<GResponse<List<GRepFriendRelation>>>() {
+            GBaseResponse<List<GRepFriendRelation>> gRelations = gson.fromJson(respS, new TypeToken<GBaseResponse<List<GRepFriendRelation>>>() {
             }.getType());
             switch (gRelations.code) {
                 case "10401":
