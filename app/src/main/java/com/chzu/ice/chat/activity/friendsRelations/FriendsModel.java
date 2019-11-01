@@ -3,14 +3,14 @@ package com.chzu.ice.chat.activity.friendsRelations;
 import android.util.Log;
 
 import com.chzu.ice.chat.App;
-import com.chzu.ice.chat.pojo.gson.GRepFriendRelation;
+import com.chzu.ice.chat.config.AppConfig;
 import com.chzu.ice.chat.pojo.gson.GReqFriendRelation;
 import com.chzu.ice.chat.pojo.gson.resp.BaseResponse;
+import com.chzu.ice.chat.pojo.gson.resp.data.LoadAllFriendRelationsData;
 import com.chzu.ice.chat.pojo.objectBox.FriendRelation;
 import com.chzu.ice.chat.pojo.objectBox.FriendRelation_;
 import com.chzu.ice.chat.pojo.objectBox.UserAccount;
 import com.chzu.ice.chat.pojo.objectBox.UserAccount_;
-import com.chzu.ice.chat.config.AppConfig;
 import com.chzu.ice.chat.utils.ObjectBoxHelper;
 import com.chzu.ice.chat.utils.SPHelper;
 import com.google.gson.Gson;
@@ -47,22 +47,23 @@ class FriendsModel {
         Gson gson = new Gson();
         SPHelper spHelper = new SPHelper(App.getApplication(), AppConfig.SP_CONFIG_ADDRESS_LOGIN_INFO);
         String signedInUsername = spHelper.getString(AppConfig.SP_CONFIG_KEY_SIGNED_IN_USER, "");
+        String accessToken = spHelper.getString(AppConfig.SP_CONFIG_KEY_SIGNED_IN_USER_ACCESS_TOKEN, "");
         GReqFriendRelation friendRelation = new GReqFriendRelation();
         friendRelation.userName = signedInUsername;
         String act = gson.toJson(friendRelation);
         RequestBody requestBody = RequestBody.create(JSON, act);
-        Request request = new Request.Builder().url(AppConfig.LOAD_FRIENDS_API).post(requestBody).build();
+        Request request = new Request.Builder().url(AppConfig.LOAD_FRIENDS_API).addHeader("AuthorizationAccessToken", accessToken).post(requestBody).build();
         try {
             Response response = okHttpClient.newCall(request).execute();
             String respS = Objects.requireNonNull(response.body()).string();
             Log.d(TAG, "run: " + respS);
-            BaseResponse<List<GRepFriendRelation>> gRelations = gson.fromJson(respS, new TypeToken<BaseResponse<List<GRepFriendRelation>>>() {
+            BaseResponse<List<LoadAllFriendRelationsData>> gRelations = gson.fromJson(respS, new TypeToken<BaseResponse<List<LoadAllFriendRelationsData>>>() {
             }.getType());
             switch (gRelations.code) {
                 case "10401":
                     friendBox.removeAll();
-                    for (GRepFriendRelation relation : gRelations.data) {
-                        Log.d(TAG, "loadAllFriends: " + relation.userName +"\t" + relation.friendName +"\t" + relation.friendTopic + "\n");
+                    for (LoadAllFriendRelationsData relation : gRelations.data) {
+                        Log.d(TAG, "loadAllFriends: " + relation.userName + "\t" + relation.friendName + "\t" + relation.friendTopic + "\n");
                         FriendRelation temp = new FriendRelation();
                         temp.setFName(relation.friendName);
                         temp.setMName(relation.userName);

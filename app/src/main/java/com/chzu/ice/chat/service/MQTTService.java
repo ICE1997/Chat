@@ -13,11 +13,13 @@ import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.chzu.ice.chat.config.MQTTConfig;
+import com.chzu.ice.chat.pojo.mqtt.MTQQMessage;
 import com.chzu.ice.chat.pojo.objectBox.FriendRelation;
 import com.chzu.ice.chat.pojo.objectBox.FriendRelation_;
 import com.chzu.ice.chat.pojo.objectBox.Message;
 import com.chzu.ice.chat.utils.ObjectBoxHelper;
 import com.chzu.ice.chat.utils.ToastHelper;
+import com.google.gson.Gson;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -66,19 +68,16 @@ public class MQTTService extends Service {
     }
 
     public void connect() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (mClient.isConnected()) {
-                        Log.d(TAG, "run: 已经连接");
-                    } else {
-                        Log.d(TAG, "run: 正在连接...");
-                        mClient.connect(opt, connectListener);
-                    }
-                } catch (MqttException e) {
-                    e.printStackTrace();
+        new Thread(() -> {
+            try {
+                if (mClient.isConnected()) {
+                    Log.d(TAG, "run: 已经连接");
+                } else {
+                    Log.d(TAG, "run: 正在连接...");
+                    mClient.connect(opt, connectListener);
                 }
+            } catch (MqttException e) {
+                e.printStackTrace();
             }
         }).start();
     }
@@ -168,6 +167,7 @@ public class MQTTService extends Service {
         ToastHelper.showToast(getApplicationContext(), "发送失败!", Toast.LENGTH_SHORT);
     }
 
+
     //收到连接信号
     private void registerConnectSignalReceiver() {
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(getApplication());
@@ -184,7 +184,6 @@ public class MQTTService extends Service {
                 }
             }
         }, intentFilter);
-
     }
 
     //发送连接连接成功信号（广播）
@@ -195,20 +194,23 @@ public class MQTTService extends Service {
 
     //收到信息信号
     private void receiveMessage(String topic, String msg) {
+        Gson gson = new Gson();
+        MTQQMessage mtqqMessage = gson.fromJson(msg, MTQQMessage.class);
+        Log.d(TAG, "receiveMessage: " + msg);
         Intent intent = new Intent(MQTTConfig.SIGNAL_RECEIVE_MESSAGE);
         intent.putExtra(MQTTConfig.EXTRA_RECEIVE_MESSAGE_TOPIC, topic);
-        intent.putExtra(MQTTConfig.EXTRA_RECEIVE_MESSAGE_MESSAGE, msg);
+        intent.putExtra(MQTTConfig.EXTRA_RECEIVE_MESSAGE_MESSAGE, mtqqMessage.getMsg());
         Message message = new Message();
-        List<FriendRelation> friendRelations = friendRelationBox.query().equal(FriendRelation_.FTopic, topic).build().find();
+        List<FriendRelation> friendRelations = friendRelationBox.query().equal(FriendRelation_.FTopic, mtqqMessage.getSenderTopic()).build().find();
         if (friendRelations.size() > 0) {
-            Log.d(TAG, "receiveMessage: > 0" );
+            Log.d(TAG, "receiveMessage: > 0");
             FriendRelation f = friendRelations.get(0);
             message.setFromU(f.getFName());
             message.setToU(f.getMName());
-            message.setMsg(msg);
+            message.setMsg(mtqqMessage.getMsg());
             messageBox.put(message);
             LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(intent);
-        }else {
+        } else {
             Log.e(TAG, "receiveMessage: NoSuchUser");
         }
     }
@@ -241,6 +243,7 @@ public class MQTTService extends Service {
             public void onReceive(Context context, Intent intent) {
                 String t = intent.getStringExtra(MQTTConfig.EXTRA_SEND_MESSAGE_TOPIC);
                 String m = intent.getStringExtra(MQTTConfig.EXTRA_SEND_MESSAGE_MESSAGE);
+                Log.d(TAG, "onReceive: Message" + m);
                 MQTTService.this.publish(t, m);
             }
         }, intentFilter);
@@ -279,13 +282,13 @@ public class MQTTService extends Service {
     private class SubscribeListener implements IMqttActionListener {
         @Override
         public void onSuccess(IMqttToken asyncActionToken) {
-            Log.d(TAG, "onSuccess: 订阅成功");
+            Log.d(TAG, "onSuccess: 订阅成功" + asyncActionToken.getTopics()[0]);
             showSubscribeSucceed();
         }
 
         @Override
         public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-            Log.d(TAG, "onFailure: 订阅失败,"+exception.getLocalizedMessage());
+            Log.d(TAG, "onFailure: 订阅失败," + exception.getLocalizedMessage());
             showSubscribeFailed();
         }
     }

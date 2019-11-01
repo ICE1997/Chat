@@ -23,7 +23,4 @@ public class MQTTConfig {
     public static final String EXTRA_RECEIVE_MESSAGE_TOPIC ="RECEIVE_MESSAGE_TOPIC";
     public static final String EXTRA_RECEIVE_MESSAGE_MESSAGE ="RECEIVE_MESSAGE_MESSAGE";
 
-
-
-
 }

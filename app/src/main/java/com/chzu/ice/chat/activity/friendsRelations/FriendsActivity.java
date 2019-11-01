@@ -59,7 +59,6 @@ public class FriendsActivity extends AppCompatActivity implements IFriendsContra
 
         Intent connect = new Intent(MQTTConfig.SIGNAL_CONNECT);
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(connect);
-
     }
 
     private void registerComponents() {
@@ -85,28 +84,22 @@ public class FriendsActivity extends AppCompatActivity implements IFriendsContra
 
     private void initData() {
         FriendsListAdapter friendsListAdapter = new FriendsListAdapter();
-        friendsListAdapter.setItemClickListener(new FriendsListAdapter.ItemClickListener() {
-            @Override
-            public void onClick(View v, int i, String s) {
-                Intent intent = new Intent(FriendsActivity.this, ChatActivity.class);
-                intent.putExtra("f_name", s);
-                startActivity(intent);
-            }
+        friendsListAdapter.setItemClickListener((v, i, s) -> {
+            Intent intent = new Intent(FriendsActivity.this, ChatActivity.class);
+            intent.putExtra("f_name", s);
+            startActivity(intent);
         });
         LinearLayoutManager llm = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         friendsList.setLayoutManager(llm);
 
         final Handler handler = new LoadFriendsHandler(friendsListAdapter, friendsList);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                List<FriendRelation> relations = friendsPresenter.loadAllFriends();
-                Message message = handler.obtainMessage();
-                message.what = 1;
-                message.obj = relations;
-                handler.sendMessage(message);
-            }
+        new Thread(() -> {
+            List<FriendRelation> relations = friendsPresenter.loadAllFriends();
+            Message message = handler.obtainMessage();
+            message.what = 1;
+            message.obj = relations;
+            handler.sendMessage(message);
         }).start();
 
     }
@@ -120,12 +113,7 @@ public class FriendsActivity extends AppCompatActivity implements IFriendsContra
     }
 
     private void registerListener() {
-        QRCodeBcg.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                QRCodeBcg.setVisibility(View.GONE);
-            }
-        });
+        QRCodeBcg.setOnClickListener(v -> QRCodeBcg.setVisibility(View.GONE));
     }
 
     @Override

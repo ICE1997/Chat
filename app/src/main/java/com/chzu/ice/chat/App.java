@@ -8,6 +8,8 @@ import com.chzu.ice.chat.service.MQTTService;
 import com.chzu.ice.chat.utils.ObjectBoxHelper;
 import com.chzu.ice.chat.utils.SPHelper;
 
+import static com.chzu.ice.chat.config.AppConfig.SP_CONFIG_KEY_SIGNED_IN_USER_TOPIC;
+
 public class App extends Application {
     private static Application application;
     private String signedInUsername;
@@ -38,8 +40,7 @@ public class App extends Application {
 
     public String getSignedInUserTopic() {
         if (signedInUserTopic == null) {
-            signedInUserTopic = new SPHelper(getApplication(), AppConfig.SP_CONFIG_ADDRESS_LOGIN_INFO).getString(AppConfig.SP_CONFIG_KEY_SIGNED_IN_USER_TOPIC, "");
-
+            signedInUserTopic = new SPHelper(getApplication(), AppConfig.SP_CONFIG_ADDRESS_LOGIN_INFO).getString(SP_CONFIG_KEY_SIGNED_IN_USER_TOPIC, "");
         }
         return signedInUserTopic;
     }

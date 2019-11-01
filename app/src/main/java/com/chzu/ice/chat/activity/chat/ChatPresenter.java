@@ -1,5 +1,7 @@
 package com.chzu.ice.chat.activity.chat;
 
+import com.chzu.ice.chat.pojo.mqtt.MTQQMessage;
+
 public class ChatPresenter implements IChatContract.Presenter {
     private ChatModel chatModel;
     private IChatContract.View chatView;
@@ -11,8 +13,8 @@ public class ChatPresenter implements IChatContract.Presenter {
     }
 
     @Override
-    public void publish(String s, String topic) {
-        chatModel.publish(s, topic, new ChatModel.PublishCallback() {
+    public void publish(MTQQMessage message) {
+        chatModel.publish(message, new ChatModel.PublishCallback() {
             @Override
             public void publishSucceed() {
                 chatView.showPublishSucceed();

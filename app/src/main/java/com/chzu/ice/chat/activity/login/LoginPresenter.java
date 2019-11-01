@@ -24,7 +24,6 @@ public class LoginPresenter implements ILoginContract.Presenter {
 
             @Override
             public void noSuchUser() {
-                spEditor.remove(AppConfig.SP_CONFIG_KEY_SIGNED_IN_USER_TOPIC);
                 spEditor.remove(AppConfig.SP_CONFIG_KEY_SIGNED_IN_USER);
                 spEditor.remove(AppConfig.SP_CONFIG_KEY_HAS_SIGNED_IN);
                 spEditor.apply();
@@ -33,7 +32,6 @@ public class LoginPresenter implements ILoginContract.Presenter {
 
             @Override
             public void wrongPassword() {
-                spEditor.remove(AppConfig.SP_CONFIG_KEY_SIGNED_IN_USER_TOPIC);
                 spEditor.remove(AppConfig.SP_CONFIG_KEY_SIGNED_IN_USER);
                 spEditor.remove(AppConfig.SP_CONFIG_KEY_HAS_SIGNED_IN);
                 spEditor.apply();
@@ -41,11 +39,13 @@ public class LoginPresenter implements ILoginContract.Presenter {
             }
 
             @Override
-            public void loginSucceed(String topic) {
+            public void loginSucceed(String accessToken, String refreshToken, String topic) {
                 spEditor.putBoolean(AppConfig.SP_CONFIG_KEY_IS_FIRST_OPEN, false);
                 spEditor.putBoolean(AppConfig.SP_CONFIG_KEY_HAS_SIGNED_IN, true);
                 spEditor.putString(AppConfig.SP_CONFIG_KEY_SIGNED_IN_USER, usr);
                 spEditor.putString(AppConfig.SP_CONFIG_KEY_SIGNED_IN_USER_TOPIC, topic);
+                spEditor.putString(AppConfig.SP_CONFIG_KEY_SIGNED_IN_USER_ACCESS_TOKEN, accessToken);
+                spEditor.putString(AppConfig.SP_CONFIG_KEY_SIGNED_IN_USER_REFRESH_TOKEN, refreshToken);
                 spEditor.apply();
                 loginView.showLoginSucceed();
             }

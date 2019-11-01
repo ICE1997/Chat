@@ -22,6 +22,7 @@ import com.chzu.ice.chat.activity.BaseActivity;
 import com.chzu.ice.chat.adapter.ChatViewAdapter;
 import com.chzu.ice.chat.config.AppConfig;
 import com.chzu.ice.chat.config.MQTTConfig;
+import com.chzu.ice.chat.pojo.mqtt.MTQQMessage;
 import com.chzu.ice.chat.pojo.objectBox.FriendRelation;
 import com.chzu.ice.chat.pojo.objectBox.FriendRelation_;
 import com.chzu.ice.chat.pojo.objectBox.Message;
@@ -85,7 +86,7 @@ public class ChatActivity extends BaseActivity implements IChatContract.View {
     }
 
     private void initSurface() {
-//        chatView.scrollToPosition((int) messageBox.count());
+        chatView.scrollToPosition((int) messageBox.count()-1);
         setBackArrow(this.chatToolbar);
     }
 
@@ -112,7 +113,7 @@ public class ChatActivity extends BaseActivity implements IChatContract.View {
                 message.setFromU("1");
                 message.setMsg(intent.getStringExtra(MQTTConfig.EXTRA_RECEIVE_MESSAGE_MESSAGE));
                 chatViewAdapter.add(message);
-//                chatView.smoothScrollToPosition((int) messageBox.count());
+                chatView.smoothScrollToPosition((int) messageBox.count());
             }
         }, intentFilter);
     }
@@ -146,8 +147,11 @@ public class ChatActivity extends BaseActivity implements IChatContract.View {
                     Box<FriendRelation> friendBox = ObjectBoxHelper.get().boxFor(FriendRelation.class);
                     FriendRelation friendRelation = friendBox.query().equal(FriendRelation_.FName, friendName).build().findFirst();
                     if (friendRelation != null) {
-                        chatPresenter.publish(input.getText().toString(), friendRelation.getFTopic());
-                    }else {
+                        MTQQMessage message = new MTQQMessage(friendRelation.getMName(), friendRelation.getFName(), MTQQMessage.TYPE_PERSON, input.getText().toString());
+                        message.setSenderTopic(((App) getApplication()).getSignedInUserTopic());
+                        message.setReceiverTopic(friendRelation.getFTopic());
+                        chatPresenter.publish(message);
+                    } else {
                         Log.e(TAG, "onKey: FriendRelation is NULL");
                     }
                 } catch (MqttException e) {

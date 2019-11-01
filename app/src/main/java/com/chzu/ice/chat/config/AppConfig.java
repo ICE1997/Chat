@@ -1,7 +1,7 @@
 package com.chzu.ice.chat.config;
 
 public class AppConfig {
-    public static final String SERVER_DEV = "http://192.168.50.71:18080/api";
+    public static final String SERVER_DEV = "http://192.168.50.70:18080/api";
     public static final String REGISTER_API = SERVER_DEV + "/userAccount/register";
     public static final String LOGIN_API = SERVER_DEV + "/userAccount/login";
     public static final String ADD_FRIEND_API = SERVER_DEV + "/friend/addFriend";
@@ -11,8 +11,10 @@ public class AppConfig {
     //用户登录配置文件
     public static final String SP_CONFIG_ADDRESS_LOGIN_INFO = "login_info";
     public static final String SP_CONFIG_KEY_SIGNED_IN_USER = "signed_in_user";
+    public static final String SP_CONFIG_KEY_SIGNED_IN_USER_TOPIC = "signed_in_user_topic";
     public static final String SP_CONFIG_KEY_HAS_SIGNED_IN = "has_signed_in";
     public static final String SP_CONFIG_KEY_IS_FIRST_OPEN = "is_first_open";
-
+    public static final String SP_CONFIG_KEY_SIGNED_IN_USER_ACCESS_TOKEN = "signed_in_user_access_token";
+    public static final String SP_CONFIG_KEY_SIGNED_IN_USER_REFRESH_TOKEN = "signed_in_user_refresh_token";
 
 }
