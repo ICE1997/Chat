@@ -3,6 +3,7 @@ package com.chzu.ice.chat.pojo.mqtt;
 public class MTQQMessage {
     public static final String TYPE_GROUP = "group";
     public static final String TYPE_PERSON = "person";
+    public static final String TYPE_PUBLIC_KEY = "pubKey";
     private String sender;
     private String senderTopic;
     private String receiver;

@@ -5,6 +5,10 @@ import android.content.SharedPreferences;
 
 import com.chzu.ice.chat.App;
 import com.chzu.ice.chat.config.AppConfig;
+import com.chzu.ice.chat.pojo.objectBox.UserAccount;
+import com.chzu.ice.chat.utils.ObjectBoxHelper;
+
+import io.objectbox.Box;
 
 public class LoginPresenter implements ILoginContract.Presenter {
     private ILoginContract.View loginView;
@@ -47,6 +51,11 @@ public class LoginPresenter implements ILoginContract.Presenter {
                 spEditor.putString(AppConfig.SP_CONFIG_KEY_SIGNED_IN_USER_ACCESS_TOKEN, accessToken);
                 spEditor.putString(AppConfig.SP_CONFIG_KEY_SIGNED_IN_USER_REFRESH_TOKEN, refreshToken);
                 spEditor.apply();
+
+                Box<UserAccount> userAccountBox = ObjectBoxHelper.get().boxFor(UserAccount.class);
+                UserAccount userAccount = new UserAccount(usr);
+                userAccountBox.put(userAccount);
+
                 loginView.showLoginSucceed();
             }
         });

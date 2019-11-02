@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -27,12 +28,24 @@ import com.chzu.ice.chat.pojo.objectBox.FriendRelation;
 import com.chzu.ice.chat.pojo.objectBox.FriendRelation_;
 import com.chzu.ice.chat.pojo.objectBox.Message;
 import com.chzu.ice.chat.pojo.objectBox.Message_;
+import com.chzu.ice.chat.pojo.objectBox.UserAccount;
+import com.chzu.ice.chat.pojo.objectBox.UserAccount_;
 import com.chzu.ice.chat.utils.ObjectBoxHelper;
+import com.chzu.ice.chat.utils.RSAUtil;
 import com.chzu.ice.chat.utils.SPHelper;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
 
+import java.security.InvalidKeyException;
+import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
 import java.util.List;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 import io.objectbox.Box;
 
@@ -58,11 +71,30 @@ public class ChatActivity extends BaseActivity implements IChatContract.View {
         new ChatPresenter(this, new ChatModel());
         initData();
         initSurface();
+        new Handler().post(new Thread(this::exchangePublicKey));
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+    }
+
+    private void exchangePublicKey() {
+        try {
+            KeyPair keyPair = RSAUtil.getKeyPair();
+            String publicKeyStr = RSAUtil.getPublicKey(keyPair);
+            String privateKeyStr = RSAUtil.getPrivateKey(keyPair);
+            Box<UserAccount> userAccountBox = ObjectBoxHelper.get().boxFor(UserAccount.class);
+            UserAccount userAccount = userAccountBox.query().equal(UserAccount_.UName, ((App) getApplication()).getSignedInUsername()).build().findFirst();
+            if (userAccount != null) {
+                userAccount.setPrivateKey(privateKeyStr);
+                userAccountBox.put(userAccount);
+            }
+            sendMessage(publicKeyStr, friendName, MTQQMessage.TYPE_PUBLIC_KEY);
+        } catch (MqttException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private void retrieveDataFromLastAct() {
@@ -86,7 +118,7 @@ public class ChatActivity extends BaseActivity implements IChatContract.View {
     }
 
     private void initSurface() {
-        chatView.scrollToPosition((int) messageBox.count()-1);
+        chatView.scrollToPosition((int) messageBox.count() - 1);
         setBackArrow(this.chatToolbar);
     }
 
@@ -138,23 +170,37 @@ public class ChatActivity extends BaseActivity implements IChatContract.View {
         this.finish();
     }
 
+    private void sendMessage(String msg, String friendName, String type) throws MqttException {
+        Box<FriendRelation> friendBox = ObjectBoxHelper.get().boxFor(FriendRelation.class);
+        FriendRelation friendRelation = friendBox.query().equal(FriendRelation_.FName, friendName).build().findFirst();
+        if (friendRelation != null) {
+            MTQQMessage message = new MTQQMessage(friendRelation.getMName(), friendRelation.getFName(), type, msg);
+            message.setSenderTopic(((App) getApplication()).getSignedInUserTopic());
+            message.setReceiverTopic(friendRelation.getFTopic());
+            chatPresenter.publish(message);
+        } else {
+            Log.e(TAG, "onKey: FriendRelation is NULL");
+        }
+    }
+
     private class InputMSGListener implements View.OnKeyListener {
         @Override
         public boolean onKey(View view, int i, KeyEvent keyEvent) {
             if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER && keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
                 Log.d(TAG, "onKey: " + input.getText());
                 try {
+                    String msgOrg = input.getText().toString();
                     Box<FriendRelation> friendBox = ObjectBoxHelper.get().boxFor(FriendRelation.class);
                     FriendRelation friendRelation = friendBox.query().equal(FriendRelation_.FName, friendName).build().findFirst();
                     if (friendRelation != null) {
-                        MTQQMessage message = new MTQQMessage(friendRelation.getMName(), friendRelation.getFName(), MTQQMessage.TYPE_PERSON, input.getText().toString());
-                        message.setSenderTopic(((App) getApplication()).getSignedInUserTopic());
-                        message.setReceiverTopic(friendRelation.getFTopic());
-                        chatPresenter.publish(message);
-                    } else {
-                        Log.e(TAG, "onKey: FriendRelation is NULL");
+                        String publicKeyStr = friendRelation.getPublicKey();
+                        PublicKey publicKey = RSAUtil.string2PublicKey(publicKeyStr);
+                        byte[] publicEncrypt = RSAUtil.publicEncrypt(msgOrg.getBytes(), publicKey);
+                        String msgDecrypted = RSAUtil.byte2Base64(publicEncrypt);
+                        sendMessage(msgDecrypted, friendName, MTQQMessage.TYPE_PERSON);
                     }
-                } catch (MqttException e) {
+
+                } catch (MqttException | NoSuchAlgorithmException | InvalidKeyException | NoSuchPaddingException | BadPaddingException | InvalidKeySpecException | IllegalBlockSizeException e) {
                     e.printStackTrace();
                 }
                 return true;

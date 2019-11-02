@@ -9,6 +9,7 @@ public class FriendRelation {
     public long id;
     private String FName;
     private String MName;
+    private String PublicKey;
     private String FTopic;
 
     public String getFName() {
@@ -33,5 +34,13 @@ public class FriendRelation {
 
     public void setMName(String MName) {
         this.MName = MName;
+    }
+
+    public String getPublicKey() {
+        return PublicKey;
+    }
+
+    public void setPublicKey(String publicKey) {
+        PublicKey = publicKey;
     }
 }

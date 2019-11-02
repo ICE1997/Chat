@@ -12,12 +12,16 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.chzu.ice.chat.App;
 import com.chzu.ice.chat.config.MQTTConfig;
 import com.chzu.ice.chat.pojo.mqtt.MTQQMessage;
 import com.chzu.ice.chat.pojo.objectBox.FriendRelation;
 import com.chzu.ice.chat.pojo.objectBox.FriendRelation_;
 import com.chzu.ice.chat.pojo.objectBox.Message;
+import com.chzu.ice.chat.pojo.objectBox.UserAccount;
+import com.chzu.ice.chat.pojo.objectBox.UserAccount_;
 import com.chzu.ice.chat.utils.ObjectBoxHelper;
+import com.chzu.ice.chat.utils.RSAUtil;
 import com.chzu.ice.chat.utils.ToastHelper;
 import com.google.gson.Gson;
 
@@ -31,9 +35,17 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 import io.objectbox.Box;
 
@@ -74,6 +86,7 @@ public class MQTTService extends Service {
                     Log.d(TAG, "run: 已经连接");
                 } else {
                     Log.d(TAG, "run: 正在连接...");
+                    opt.setUserName(((App) getApplication()).getSignedInUsername());
                     mClient.connect(opt, connectListener);
                 }
             } catch (MqttException e) {
@@ -194,25 +207,49 @@ public class MQTTService extends Service {
 
     //收到信息信号
     private void receiveMessage(String topic, String msg) {
+        Log.d(TAG, "receiveMessage: " + msg);
         Gson gson = new Gson();
         MTQQMessage mtqqMessage = gson.fromJson(msg, MTQQMessage.class);
-        Log.d(TAG, "receiveMessage: " + msg);
-        Intent intent = new Intent(MQTTConfig.SIGNAL_RECEIVE_MESSAGE);
-        intent.putExtra(MQTTConfig.EXTRA_RECEIVE_MESSAGE_TOPIC, topic);
-        intent.putExtra(MQTTConfig.EXTRA_RECEIVE_MESSAGE_MESSAGE, mtqqMessage.getMsg());
-        Message message = new Message();
+
         List<FriendRelation> friendRelations = friendRelationBox.query().equal(FriendRelation_.FTopic, mtqqMessage.getSenderTopic()).build().find();
+
         if (friendRelations.size() > 0) {
             Log.d(TAG, "receiveMessage: > 0");
             FriendRelation f = friendRelations.get(0);
-            message.setFromU(f.getFName());
-            message.setToU(f.getMName());
-            message.setMsg(mtqqMessage.getMsg());
-            messageBox.put(message);
-            LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(intent);
+            if (mtqqMessage.getType().equals(MTQQMessage.TYPE_PUBLIC_KEY)) {
+                String key = mtqqMessage.getMsg();
+                Log.d(TAG, "receiveMessage: " + key);
+                f.setPublicKey(key);
+                friendRelationBox.put(f);
+            } else {
+                String msgEncrypted = mtqqMessage.getMsg();
+                Box<UserAccount> userAccountBox = ObjectBoxHelper.get().boxFor(UserAccount.class);
+                UserAccount userAccount = userAccountBox.query().equal(UserAccount_.UName, ((App) getApplication()).getSignedInUsername()).build().findFirst();
+                if (userAccount != null) {
+                    String privateKeyStr = userAccount.getPrivateKey();
+                    PrivateKey privateKey = null;
+                    try {
+                        privateKey = RSAUtil.string2PrivateKey(privateKeyStr);
+                        byte[] base642Byte = RSAUtil.base642Byte(msgEncrypted);
+                        byte[] msgDecrypted = RSAUtil.privateDecrypt(base642Byte, privateKey);
+                        Message message = new Message();
+                        message.setFromU(f.getFName());
+                        message.setToU(f.getMName());
+                        message.setMsg(new String(msgDecrypted));
+                        messageBox.put(message);
+                        Intent intent = new Intent(MQTTConfig.SIGNAL_RECEIVE_MESSAGE);
+                        intent.putExtra(MQTTConfig.EXTRA_RECEIVE_MESSAGE_TOPIC, topic);
+                        intent.putExtra(MQTTConfig.EXTRA_RECEIVE_MESSAGE_MESSAGE, new String(msgDecrypted));
+                        LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(intent);
+                    } catch (NoSuchAlgorithmException | InvalidKeySpecException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         } else {
             Log.e(TAG, "receiveMessage: NoSuchUser");
         }
+
     }
 
     //注册订阅主题的信号
